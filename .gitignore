@@ -1,0 +1,24 @@
+# Archivos de configuración
+App/config.php
+.env
+
+# Archivos temporales de PHP
+*.log
+*.cache
+
+# IDEs y editores
+.idea/
+.vscode/
+
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Archivos generados por el sistema
+error_log
+debug.log
+/logs/*
+
+# Respaldos de base de datos
+*.sql
+/bash.exe.stackdump
