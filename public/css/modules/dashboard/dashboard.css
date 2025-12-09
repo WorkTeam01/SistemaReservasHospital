@@ -1,0 +1,107 @@
+/* ========================================
+   Dashboard Module - Estilos Específicos
+   ======================================== */
+
+/* Small boxes del dashboard (AdminLTE) */
+.small-box {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.small-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Animación suave al aparecer */
+.small-box {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Delay escalonado para cada tarjeta */
+.col-lg-3:nth-child(1) .small-box {
+    animation-delay: 0s;
+}
+
+.col-lg-3:nth-child(2) .small-box {
+    animation-delay: 0.1s;
+}
+
+.col-lg-3:nth-child(3) .small-box {
+    animation-delay: 0.2s;
+}
+
+.col-lg-3:nth-child(4) .small-box {
+    animation-delay: 0.3s;
+}
+
+/* Animación de números */
+.info-box-number {
+    font-weight: 700;
+    font-size: 2rem;
+    display: inline-block;
+}
+
+/* Footer de la tarjeta con hover mejorado */
+.small-box-footer {
+    transition: background-color 0.3s ease;
+}
+
+.small-box-footer:hover {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Tarjetas de estadísticas */
+.card.card-stats {
+    border-top: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.card.card-stats.card-primary {
+    border-top-color: #007bff;
+}
+
+.card.card-stats.card-success {
+    border-top-color: #28a745;
+}
+
+.card.card-stats.card-warning {
+    border-top-color: #ffc107;
+}
+
+.card.card-stats.card-danger {
+    border-top-color: #dc3545;
+}
+
+.card.card-stats:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Tabla de próximas citas */
+.appointments-table {
+    font-size: 0.9rem;
+}
+
+.appointments-table .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .info-box-number {
+        font-size: 1.5rem;
+    }
+}

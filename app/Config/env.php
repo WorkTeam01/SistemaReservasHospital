@@ -37,7 +37,7 @@ function loadEnv($path): void
 
 // Cargar variables de entorno
 try {
-    loadEnv(__DIR__ . '/../.env');
+    loadEnv(__DIR__ . '/../../.env');
 } catch (Exception $e) {
     die('Error loading .env file: ' . $e->getMessage());
 }
@@ -49,7 +49,7 @@ try {
  * @param mixed|null $default Valor por defecto si la variable no existe
  * @return mixed
  */
-function env(string $key, $default = null)
+function env(string $key, mixed $default = null): mixed
 {
     $value = getenv($key);
 
@@ -58,20 +58,11 @@ function env(string $key, $default = null)
     }
 
     // Manejar valores booleanos
-    switch (strtolower($value)) {
-        case 'true':
-        case '(true)':
-            return true;
-        case 'false':
-        case '(false)':
-            return false;
-        case 'null':
-        case '(null)':
-            return null;
-        case 'empty':
-        case '(empty)':
-            return '';
-        default:
-            return $value;
-    }
+    return match (strtolower($value)) {
+        'true', '(true)' => true,
+        'false', '(false)' => false,
+        'null', '(null)' => null,
+        'empty', '(empty)' => '',
+        default => $value,
+    };
 }

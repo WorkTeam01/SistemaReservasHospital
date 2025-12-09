@@ -30,6 +30,13 @@
   <!-- Custom JS (Core) -->
   <script src="<?= URL_BASE; ?>/js/core/app.js"></script>
 
+  <!-- Page-specific JS -->
+  <?php if (!empty($pageScripts)): ?>
+      <?php foreach ($pageScripts as $script): ?>
+          <script src="<?= URL_BASE; ?>/<?= $script; ?>"></script>
+      <?php endforeach; ?>
+  <?php endif; ?>
+
   <!-- Plugins scripts (Examples) -->
   <!-- <script src="<?= URL_BASE; ?>/js/plugins/sweetalert2/sweetalert2.min.js"></script> -->
 

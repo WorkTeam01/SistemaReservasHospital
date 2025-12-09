@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HospitalSystem | MVP</title>
+    <title><?= $pageTitle ?? 'Sistema de Reservas Hospital'; ?></title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/bootstrap/bootstrap.min.css">
@@ -18,18 +18,25 @@
     <!-- Theme style (AdminLTE) -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/adminlte/adminlte.min.css">
 
-    <!-- Custom CSS (Core) -->
+    <!-- Custom style -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/core/style.css">
 
     <!-- Icon -->
     <link rel="icon" type="image/png" href="<?= URL_BASE; ?>/img/cita-medica.png">
+
+    <!-- Page-specific CSS -->
+    <?php if (!empty($pageStyles)): ?>
+        <?php foreach ($pageStyles as $style): ?>
+            <link rel="stylesheet" href="<?= URL_BASE; ?>/<?= $style; ?>">
+        <?php endforeach; ?>
+    <?php endif; ?>
 
     <!-- Plugins (Select2, SweetAlert2, DataTables) -->
     <!-- Se pueden cargar condicionalmente si es necesario, por ahora dejamos ejemplos comentados -->
     <!-- <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/select2/select2.min.css"> -->
 </head>
 
-<body class="hold-transition sidebar-mini">
+<body class="sidebar-mini layout-fixed">
     <!-- Site wrapper -->
     <div class="wrapper">
         <!-- Navbar -->

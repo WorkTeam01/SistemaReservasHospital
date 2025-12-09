@@ -1,12 +1,14 @@
-<?php require_once __DIR__ . '/../layouts/header.php'; ?>
-<?php require_once __DIR__ . '/../layouts/sidebar.php'; ?>
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Dashboard Administrador</h1>
+                <h1>Panel Administrador</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active">Panel</li>
+                </ol>
             </div>
         </div>
     </div><!-- /.container-fluid -->
@@ -14,48 +16,79 @@
 
 <!-- Main content -->
 <section class="content">
-    <!-- Default box -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Bienvenido, <?= $_SESSION['user_name']; ?></h3>
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div class="container-fluid">
+
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3 class="info-box-number" id="total-users"><?= $totalUsers ?? 0; ?></h3>
+                        <p>Usuarios Activos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <a href="<?= URL_BASE; ?>/usuarios" class="small-box-footer">
+                        Más info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="card-body">
-            <p>En esta sección se mostrarán las estadísticas y accesos directos.</p>
+            <!-- ./col -->
 
-            <?php
-            $db = Database::getInstance();
-            $conn = $db->getConnection();
-            ?>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3 class="info-box-number" id="total-patients"><?= $totalPatients ?? 0; ?></h3>
+                        <p>Pacientes Registrados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a href="<?= URL_BASE; ?>/pacientes" class="small-box-footer">
+                        Más info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+            <!-- ./col -->
 
-            <?php if ($conn): ?>
-                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                    <i class="fas fa-check-circle"></i> Conexión a Base de Datos: <strong>Correcta</strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <!-- small box -->
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3 class="info-box-number" id="pending-appointments"><?= $pendingAppointments ?? 0; ?></h3>
+                        <p>Citas Pendientes</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <a href="<?= URL_BASE; ?>/citas?status=pending" class="small-box-footer">
+                        Más info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
-            <?php else: ?>
-                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i> Error de Conexión: <strong><?= $db->getError(); ?></strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            </div>
+            <!-- ./col -->
+
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3 class="info-box-number" id="today-appointments"><?= $todayAppointments ?? 0; ?></h3>
+                        <p>Citas de Hoy</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <a href="<?= URL_BASE; ?>/citas?date=today" class="small-box-footer">
+                        Más info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
                 </div>
-            <?php endif; ?>
+            </div>
+            <!-- ./col -->
         </div>
-        <!-- /.card-body -->
+        <!-- /.row -->
     </div>
-    <!-- /.card -->
-
 </section>
 <!-- /.content -->
-
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?>

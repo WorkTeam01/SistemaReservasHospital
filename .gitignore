@@ -1,5 +1,5 @@
 # Archivos de configuración
-config/config.php
+app/Config/config.php
 .env
 
 # Archivos temporales de PHP

@@ -1,90 +1,186 @@
-# 🏥 Sistema de Reservas Hospitalarias (MVP)
+O# 🏥 Sistema de Reservas Hospitalarias
 
-Sistema de gestión básica para clínicas u hospitales, permitiendo la administración de citas médicas, pacientes, doctores y especialidades. Desarrollado en **PHP Vanilla** con arquitectura MVC y diseño **AdminLTE 3.2.0**.
+Sistema de gestión para clínicas y hospitales, permitiendo la administración de citas médicas, pacientes, doctores y especialidades. Desarrollado en **PHP Vanilla** con arquitectura **MVC** y diseño **AdminLTE**.
 
 ---
 
-## 🚀 Tecnologías Utilizadas
+## 🚀 Tecnologías
 
-- **Lenguaje**: PHP 8.2+
-- **Base de Datos**: MySQL / MariaDB
+- **Backend**: PHP 8.2+ (Arquitectura MVC)
+- **Base de Datos**: MySQL / MariaDB (PDO)
 - **Frontend**:
-  - HTML5 / CSS3
-  - Bootstrap 4 (via AdminLTE)
-  - AdminLTE 3 (Plantilla Administrativa)
-  - FontAwesome 5 (Iconos)
-- **Servidor**: Apache (XAMPP/LAMP recomendado)
+  - Bootstrap 4 (vía AdminLTE)
+  - AdminLTE 3.2.0
+  - FontAwesome 5
+  - jQuery 3
+- **Servidor**: Apache (XAMPP/LAMP)
 
 ---
 
-## 📋 Requisitos Previos
+## 📋 Requisitos
 
-1.  **Servidor Web**: XAMPP, Laragon, o LAMP Stack instalado.
-2.  **Versión PHP**: Mínimo 8.0 (Recomendado 8.2+).
-3.  **Configuración PHP**: Habilitar extensión `pdo_mysql`.
+- PHP 8.0+ (Recomendado 8.2+)
+- MySQL 5.7+ / MariaDB 10+
+- Apache con mod_rewrite
+- Extensión PHP: `pdo_mysql`
 
 ---
 
-## 🔧 Instalación y Configuración
+## 🔧 Instalación Rápida
 
-Sigue estos pasos para levantar el proyecto en tu entorno local:
+### 1. Clonar el Repositorio
 
-### 1. Clonar o Descargar el Proyecto
+```bash
+git clone https://github.com/WorkTeam01/SistemaReservasHospital.git
+cd SistemaReservasHospital
+```
 
-Coloca la carpeta del proyecto en tu directorio de servidor web (ej. `htdocs` en XAMPP o `/var/www/html` en Linux).
+### 2. Configurar Base de Datos
 
-### 2. Base de Datos
+1. Crear base de datos: `hospital_db`
+2. Importar: `database.sql`
 
-1.  Abre tu gestor de base de datos (ej. phpMyAdmin).
-2.  Crea una nueva base de datos llamada `hospital_db` (o el nombre que prefieras).
-3.  Importa el archivo script SQL ubicado en la raíz del proyecto:
-    - Archivo: `database.sql`
-4.  Esto creará las tablas necesarias (`users`, `patients`, `appointments`, `specialties`, etc) y creará un usuario administrador por defecto.
+### 3. Configurar Variables de Entorno
 
-### 3. Configuración de Entorno (.env)
+```bash
+cp .env.example .env
+```
 
-1.  Ubica el archivo `.env.example` en la raíz del proyecto.
-2.  Duplícalo o renómbralo a `.env`.
-3.  Edita el archivo `.env` con tus credenciales locales:
+Editar `.env`:
 
 ```ini
-# Configuración del Sistema
 BASE_URL="http://localhost/SistemaReservasHospital/public"
-
-# Base de Datos
 DB_HOST="localhost"
 DB_NAME="hospital_db"
 DB_USER="root"
 DB_PASS=""
 ```
 
-> **Nota**: Asegúrate de que `BASE_URL` apunte correctamente a la carpeta `public` de tu proyecto.
+### 4. Acceder al Sistema
+
+Abrir en navegador: `http://localhost/SistemaReservasHospital/public`
+
+**Usuario por defecto:**
+
+- Email: `admin@example.com`
+- Contraseña: `password`
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
-- **`/config`**: Archivos de configuración y conexión a BD (`db.php`, `env.php`).
-- **`/public`**: Punto de entrada (`index.php`) y assets públicos (CSS, JS, Imágenes).
-- **`/views`**: Vistas HTML organizadas por módulos (`dashboard`, `layouts`, etc).
-- **`/app`**: (En desarrollo) Controladores y Modelos.
-- **`database.sql`**: Script de creación de la base de datos.
+```
+SistemaReservasHospital/
+├── .github/              # GitHub configs y documentación
+│   ├── DEVELOPER_GUIDE.md
+│   └── docs/
+├── app/                  # Lógica de la aplicación
+│   ├── Config/          # Configuraciones
+│   ├── Controllers/     # Controladores MVC
+│   ├── Core/           # Clases base (Router, Model, etc.)
+│   └── Models/         # Modelos de datos
+├── routes/              # Definición de rutas
+│   └── web.php
+├── views/               # Vistas HTML/PHP
+│   ├── dashboard/
+│   ├── errors/
+│   └── layouts/
+├── public/              # Punto de entrada web
+│   ├── index.php       # Front controller
+│   ├── css/
+│   ├── js/
+│   └── img/
+├── vendor/              # Librerías de terceros
+├── database.sql         # Esquema de BD
+└── .env                # Variables de entorno
+```
 
 ---
 
-## 👤 Acceso por Defecto
+## 📚 Documentación
 
-Una vez instalada la base de datos, puedes acceder con el siguiente usuario administrador (si usas los datos de prueba del script SQL):
+### Para Desarrolladores
 
-- **Usuario/Email**: `admin@example.com`
-- **Contraseña**: `password` (El hash en la BD corresponde a "password" por defecto en Laravel/Standard bcrypt).
+📖 **[Guía de Desarrollo Completa](.github/DEVELOPER_GUIDE.md)**
+
+Incluye:
+
+- Arquitectura MVC detallada
+- Convenciones de código
+- Cómo crear nuevos módulos
+- Sistema de rutas y middleware
+- Buenas prácticas
+
+### Características Implementadas
+
+- ✅ **Arquitectura MVC** - Separación clara de responsabilidades
+- ✅ **Sistema de Rutas** - Router personalizado con middleware
+- ✅ **Autoloader PSR-4** - Carga automática de clases
+- ✅ **Layouts Reutilizables** - Sistema de plantillas (header, sidebar, footer)
+- ✅ **Dashboard Administrativo** - Panel con estadísticas en tiempo real
+- ✅ **Middleware de Autenticación** - Protección de rutas
+- ✅ **Páginas de Error** - 404 personalizado
+- ✅ **Base de Datos** - PDO con prepared statements
+
+### En Desarrollo
+
+- 🚧 Gestión de Usuarios (Doctores, Recepcionistas, Admins)
+- 🚧 Gestión de Pacientes
+- 🚧 Agendamiento de Citas Médicas
+- 🚧 Calendario de Citas
+- 🚧 Gestión de Especialidades
+- 🚧 Sistema de Reportes
 
 ---
 
-## ✨ Características (MVP)
+## 🛠️ Tecnologías y Librerías
 
-- [x] Panel de Control (Dashboard) con AdminLTE.
-- [x] Verificación de conexión a Base de Datos en el Dashboard.
-- [ ] Gestión de Usuarios (Doctores, Recepcionistas).
-- [ ] Gestión de Pacientes.
-- [ ] Agendamiento de Citas Médicas.
+### Backend
+
+- **PHP 8.2+** - Lenguaje del servidor
+- **PDO** - Capa de abstracción de base de datos
+- **MVC Pattern** - Arquitectura del proyecto
+
+### Frontend
+
+- **AdminLTE 3** - Template administrativo
+- **Bootstrap 4.6** - Framework CSS
+- **jQuery 3** - Manipulación del DOM
+- **Font Awesome 5** - Iconos
+
+---
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'Agrega nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+**Consulta la [Guía de Desarrollo](.github/DEVELOPER_GUIDE.md) antes de contribuir.**
+
+---
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+---
+
+## 👥 Equipo
+
+**WorkTeam01** - [GitHub](https://github.com/WorkTeam01)
+
+---
+
+## 📞 Soporte
+
+Para preguntas o problemas:
+
+- 📧 Crear un [Issue](https://github.com/WorkTeam01/SistemaReservasHospital/issues)
+- 📖 Consultar la [Documentación](.github/DEVELOPER_GUIDE.md)
+
+---
+
+_Sistema de Reservas Hospitalarias - Versión 1.0.0_
