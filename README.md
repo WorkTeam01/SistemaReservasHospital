@@ -1,4 +1,4 @@
-O# 🏥 Sistema de Reservas Hospitalarias
+# 🏥 Sistema de Reservas Hospitalarias
 
 Sistema de gestión para clínicas y hospitales, permitiendo la administración de citas médicas, pacientes, doctores y especialidades. Desarrollado en **PHP Vanilla** con arquitectura **MVC** y diseño **AdminLTE**.
 
@@ -72,8 +72,10 @@ Abrir en navegador: `http://localhost/SistemaReservasHospital/public`
 ```
 SistemaReservasHospital/
 ├── .github/              # GitHub configs y documentación
-│   ├── DEVELOPER_GUIDE.md
-│   └── docs/
+│   ├── ISSUE_TEMPLATE/       # Plantillas de issues
+│   ├── PULL_REQUEST_TEMPLATE/ # Plantillas de pull requests
+│   ├── docs/         # Documentación del proyecto
+│   └── sync-labels.sh  # Script para sincronizar labels en GitHub
 ├── app/                  # Lógica de la aplicación
 │   ├── Config/          # Configuraciones
 │   ├── Controllers/     # Controladores MVC
@@ -159,6 +161,18 @@ Incluye:
 5. Abre un Pull Request
 
 **Consulta la [Guía de Desarrollo](.github/DEVELOPER_GUIDE.md) antes de contribuir.**
+
+### 🏷️ Sistema de Labels
+
+El proyecto usa un sistema organizado de labels para issues y PRs:
+
+- **Priority**: `critical`, `high`, `medium`, `low`
+- **Type**: `bug`, `feature`, `enhancement`, `documentation`, `testing`, `refactor`, `security`
+- **Status**: `ready`, `in-progress`, `needs-review`, `blocked`, `on-hold`
+- **Module**: `auth`, `usuarios`, `pacientes`, `citas`, `especialidades`, `dashboard`, `reportes`, `core`
+- **Effort**: `small` (<1 día), `medium` (1-3 días), `large` (>3 días)
+
+Al crear un issue usando los templates, los labels se aplican automáticamente.
 
 ---
 
