@@ -1,24 +1,18 @@
 <?php
 
-use App\Core\Middleware;
+use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
 
-// --- Definición de Rutas ---
+// --- Rutas de Autenticación ---
 
-// Dashboard (Ruta principal)
-$router->get('/', function () {
-    $controller = new \App\Controllers\DashboardController();
-    $controller->index();
-});
+// Mostrar formulario de login
+$router->get('/login', [AuthController::class, 'showLogin']);
 
-// Login Demo
-$router->get('/login-demo', function () {
-    Middleware::guest(); // Solo invitados
-    echo "<h1>Login Page (Use AuthController)</h1>";
-});
+// Procesar login
+$router->post('/login', [AuthController::class, 'login']);
 
-// Logout
-$router->get('/logout', function () {
-    session_destroy();
-    header('Location: ' . URL_BASE . '/login-demo');
-    exit;
-});
+// --- Rutas Protegidas ---
+
+// Dashboard principal (redirige según rol)
+$router->get('/', [DashboardController::class, 'index']);
+$router->get('/dashboard', [DashboardController::class, 'index']);
