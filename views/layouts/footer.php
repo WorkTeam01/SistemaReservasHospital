@@ -26,9 +26,15 @@
   <script src="<?= URL_BASE; ?>/js/lib/bootstrap/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="<?= URL_BASE; ?>/js/lib/adminlte/adminlte.min.js"></script>
+  <!-- Plugins (Select2, SweetAlert2, DataTables) -->
+  <script src="<?= URL_BASE; ?>/js/plugins/sweetalert2/sweetalert2.all.min.js"></script>
 
   <!-- Custom JS (Core) -->
+  <script src="<?= URL_BASE; ?>/js/core/sweetalert-utils.js"></script>
   <script src="<?= URL_BASE; ?>/js/core/app.js"></script>
+
+  <!-- Flash Messages -->
+  <?php require_once __DIR__ . '/messages.php'; ?>
 
   <!-- Page-specific JS -->
   <?php if (!empty($pageScripts)): ?>
@@ -36,10 +42,6 @@
           <script src="<?= URL_BASE; ?>/<?= $script; ?>"></script>
       <?php endforeach; ?>
   <?php endif; ?>
-
-  <!-- Plugins scripts (Examples) -->
-  <!-- <script src="<?= URL_BASE; ?>/js/plugins/sweetalert2/sweetalert2.min.js"></script> -->
-
   </body>
 
   </html>

@@ -8,19 +8,16 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/bootstrap/bootstrap.min.css">
-
     <!-- Google Font: Source Sans Pro (Local) -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/core/fonts.css">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/fontawesome/css/all.min.css">
-
     <!-- Theme style (AdminLTE) -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/adminlte/adminlte.min.css">
-
     <!-- Custom style -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/core/style.css">
-
+    <!-- Plugins (Select2, SweetAlert2, DataTables) -->
+    <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/sweetalert2/sweetalert2.min.css">
     <!-- Icon -->
     <link rel="icon" type="image/png" href="<?= URL_BASE; ?>/img/cita-medica.png">
 
@@ -30,10 +27,6 @@
             <link rel="stylesheet" href="<?= URL_BASE; ?>/<?= $style; ?>">
         <?php endforeach; ?>
     <?php endif; ?>
-
-    <!-- Plugins (Select2, SweetAlert2, DataTables) -->
-    <!-- Se pueden cargar condicionalmente si es necesario, por ahora dejamos ejemplos comentados -->
-    <!-- <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/select2/select2.min.css"> -->
 </head>
 
 <body class="sidebar-mini layout-fixed">
