@@ -10,6 +10,8 @@ $router->get('/login', [AuthController::class, 'showLogin']);
 
 // Procesar login
 $router->post('/login', [AuthController::class, 'login']);
+//Cerrar sesión
+$router->get('/logout', [AuthController::class, 'logout']);
 
 // --- Rutas Protegidas ---
 
