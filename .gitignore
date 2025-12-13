@@ -21,5 +21,6 @@ debug.log
 
 # Respaldos de base de datos
 *.sql
+!database.sql
 /bash.exe.stackdump
 .github/sync-labels.sh
