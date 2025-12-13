@@ -91,4 +91,14 @@ class Auth
     {
         return $_SESSION['user_id'] ?? null;
     }
+    
+    /**
+     * Cierra la sesión del usuario actual
+     * @return void 
+     */
+    public static function logout()
+    {
+        // Destruir la sesión
+        session_destroy();
+    }
 }

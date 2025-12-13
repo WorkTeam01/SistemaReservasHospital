@@ -93,5 +93,30 @@ class AuthController extends Controller
             $_SESSION['icon'] = 'error';
             $this->redirect('/login');
         }
+
+        // Limpiar TODAS las variables de sesión
+        $_SESSION = [];
+
+        // Destruir la cookie de sesión
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time() - 3600, '/');
+        }
+        // Redirigir al login
+        $this->redirect('/login');
+    }
+
+    /**
+     * Cierra la sesión del usuario actual
+     */
+    public function logout()
+    {
+        // Verificar que el usuario esté autenticado
+        Middleware::auth();
+
+        // Cerrar sesión
+        Auth::logout();
+        
+        // Redirigir al login
+        $this->redirect('/login');
     }
 }
