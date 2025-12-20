@@ -27,6 +27,10 @@
             <link rel="stylesheet" href="<?= URL_BASE; ?>/<?= $style; ?>">
         <?php endforeach; ?>
     <?php endif; ?>
+    <!-- Global JS Variables -->
+    <script>
+        const URL_BASE = "<?= URL_BASE; ?>";
+    </script>
 </head>
 
 <body class="sidebar-mini layout-fixed">

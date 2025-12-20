@@ -22,6 +22,10 @@
 
   <!-- jQuery -->
   <script src="<?= URL_BASE; ?>/js/lib/jquery/jquery.min.js"></script>
+  <!-- jQuery Validate -->
+  <script src="<?= URL_BASE; ?>/js/lib/jquery/jquery.validate.min.js"></script>
+  <!-- jQuery Validate -->
+  <script src="<?= URL_BASE; ?>/js/lib/jquery/jquery.validate.messages_es.min.js"></script>
   <!-- Bootstrap 4 -->
   <script src="<?= URL_BASE; ?>/js/lib/bootstrap/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
