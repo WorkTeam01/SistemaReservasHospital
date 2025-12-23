@@ -13,7 +13,4 @@ $(document).ready(function () {
     //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     //     }
     // });
-
-    // Aquí puedes agregar inicializaciones globales
-    console.log('Hospital System - App initialized');
 });

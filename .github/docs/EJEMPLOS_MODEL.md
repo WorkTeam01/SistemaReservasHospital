@@ -6,6 +6,312 @@ El `Model.php` mejorado incluye métodos CRUD que funcionan automáticamente con
 
 ---
 
+## 🔐 Sistema de Autenticación
+
+### Ejemplo Completo: Módulo de Login con CSRF
+
+#### 1. Controlador de Autenticación
+
+```php
+<?php
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\Middleware;
+use App\Core\Auth;
+use App\Models\User;
+
+class AuthController extends Controller
+{
+    private $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+
+    // Mostrar formulario de login
+    public function showLogin(): void
+    {
+        Middleware::guest();  // Solo usuarios no autenticados
+        $csrfToken = Auth::generateCsrfToken();
+
+        $this->render('auth/login', [
+            'pageTitle' => 'Iniciar Sesión',
+            'csrfToken' => $csrfToken
+        ]);
+    }
+
+    // Procesar login
+    public function login(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/login');
+            return;
+        }
+
+        // Validar CSRF token
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!Auth::validateCsrfToken($csrfToken)) {
+            $_SESSION['message'] = 'Token de seguridad inválido';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/login');
+            return;
+        }
+
+        // Sanitizar datos
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $password = $_POST['password'] ?? '';
+
+        // Validar campos
+        if (empty($email) || empty($password)) {
+            $_SESSION['message'] = 'Email y contraseña son obligatorios';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/login');
+            return;
+        }
+
+        // Buscar usuario activo
+        $user = $this->userModel->findByEmail($email);
+
+        // Verificar contraseña
+        if ($user && password_verify($password, $user['password'])) {
+            Auth::login($user);
+            $_SESSION['welcome_user'] = $user['name'];
+            $this->redirect('/dashboard');
+        } else {
+            $_SESSION['message'] = 'Credenciales incorrectas';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/login');
+        }
+    }
+
+    // Cerrar sesión
+    public function logout(): void
+    {
+        Middleware::auth();
+        Auth::logout();
+        $_SESSION['message'] = 'Has cerrado sesión correctamente';
+        $_SESSION['icon'] = 'success';
+        $this->redirect('/login');
+    }
+}
+```
+
+#### 2. Modelo de Usuario
+
+```php
+<?php
+namespace App\Models;
+
+use App\Core\Model;
+
+class User extends Model
+{
+    // No define $table porque usa queries personalizadas
+
+    // Buscar usuario activo por email
+    public function findByEmail($email)
+    {
+        $sql = "SELECT * FROM users WHERE email = :email AND is_active = 1";
+        return $this->query($sql, ['email' => $email])->fetch();
+    }
+
+    // Buscar usuario incluyendo inactivos (para mensajes específicos)
+    public function findByEmailIncludingInactive($email)
+    {
+        $sql = "SELECT * FROM users WHERE email = :email";
+        return $this->query($sql, ['email' => $email])->fetch();
+    }
+
+    // Buscar usuario por ID
+    public function findById($userId)
+    {
+        $sql = "SELECT * FROM users WHERE user_id = :user_id AND is_active = 1";
+        return $this->query($sql, ['user_id' => $userId])->fetch();
+    }
+}
+```
+
+#### 3. Vista de Login
+
+```php
+<!-- views/auth/login.php -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title><?= $pageTitle ?? 'Login'; ?></title>
+    <!-- CSS aquí -->
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="card">
+            <div class="card-body">
+                <form id="loginForm" action="<?= URL_BASE; ?>/login" method="post">
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="<?= $csrfToken; ?>">
+
+                    <!-- Email -->
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" name="email" 
+                               placeholder="Email" required>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" name="password" 
+                               placeholder="Contraseña" required>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Iniciar Sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- JS aquí -->
+</body>
+</html>
+```
+
+#### 4. Rutas de Autenticación
+
+```php
+// routes/web.php
+$router->get('/login', function () {
+    (new \App\Controllers\AuthController())->showLogin();
+});
+
+$router->post('/login', function () {
+    (new \App\Controllers\AuthController())->login();
+});
+
+$router->get('/logout', function () {
+    (new \App\Controllers\AuthController())->logout();
+});
+```
+
+---
+
+---
+
+## 👤 Datos de Usuario Automáticos en Vistas
+
+### Sistema Automático de Usuario
+
+**El sistema automáticamente proporciona datos del usuario autenticado en todas las vistas con layout.**
+
+Cuando usas `renderWithLayout()`, estas variables están disponibles automáticamente:
+
+- `$userName` - Nombre del usuario autenticado
+- `$userRole` - Rol del usuario (admin, doctor, receptionist)
+
+#### Ejemplo en el Controlador
+
+```php
+public function index()
+{
+    // NO necesitas pasar userName y userRole manualmente
+    $data = [
+        'pageTitle' => 'Gestión de Pacientes',
+        'pageStyles' => ['css/modules/patients/patients.css'],
+        'pageScripts' => ['js/modules/patients/patients.js'],
+        'patients' => $this->patientModel->all()
+    ];
+
+    // renderWithLayout automáticamente agrega userName y userRole
+    $this->renderWithLayout('patients/index', $data);
+}
+```
+
+#### Uso en Header
+
+```php
+<!-- views/layouts/header.php -->
+<li class="nav-item dropdown user-menu">
+    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+        <span class="d-none d-md-inline mr-2"><?= $userName; ?></span>
+        <i class="fas fa-caret-down"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li class="user-header">
+            <img src="<?= URL_BASE ?>/img/user-default.jpg" 
+                 class="img-circle" alt="User Image">
+            <p>
+                <?= $userName; ?>
+                <small><?= ucfirst($userRole); ?></small>
+            </p>
+        </li>
+        <li class="user-footer">
+            <a href="<?= URL_BASE; ?>/perfil" class="btn btn-default btn-flat">
+                Perfil
+            </a>
+            <a href="<?= URL_BASE; ?>/logout" class="btn btn-default btn-flat float-right">
+                Cerrar Sesión
+            </a>
+        </li>
+    </ul>
+</li>
+```
+
+#### Uso en Vistas
+
+```php
+<!-- views/dashboard/admin.php -->
+<section class="content-header">
+    <h1>Bienvenido, <?= $userName; ?></h1>
+    <p>Rol: <?= ucfirst($userRole); ?></p>
+</section>
+
+<section class="content">
+    <!-- Tu contenido aquí -->
+</section>
+```
+
+### Cómo Funciona Internamente
+
+```php
+// En app/Core/Controller.php
+protected function renderWithLayout($view, $data = [])
+{
+    // Obtener datos del usuario autenticado
+    $user = Auth::user();
+    
+    // Agregar userName y userRole automáticamente
+    if (!isset($data['userName'])) {
+        $data['userName'] = $user['name'] ?? 'Usuario';
+    }
+    if (!isset($data['userRole'])) {
+        $data['userRole'] = $user['role'] ?? 'Usuario';
+    }
+    
+    // Continuar con el renderizado...
+}
+```
+
+### Sobrescribir Datos de Usuario (Opcional)
+
+Si necesitas mostrar datos de otro usuario en una vista específica:
+
+```php
+public function showProfile($userId)
+{
+    $profileUser = $this->userModel->find($userId);
+    
+    $this->renderWithLayout('users/profile', [
+        'pageTitle' => 'Perfil de Usuario',
+        // Sobrescribir userName para mostrar el perfil de otro usuario
+        'profileName' => $profileUser['name'],
+        'profileRole' => $profileUser['role'],
+        // $userName y $userRole siguen siendo del usuario autenticado
+    ]);
+}
+```
+
+---
+
 ## 🎯 Ejemplo 1: Modelo de Pacientes
 
 ```php

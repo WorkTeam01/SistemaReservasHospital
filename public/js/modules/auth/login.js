@@ -45,7 +45,7 @@ $(document).ready(function () {
             // Deshabilitar botón y mostrar spinner de Bootstrap
             const $submitBtn = $(form).find('button[type="submit"]');
             $submitBtn.prop('disabled', true)
-                .html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Iniciando sesión...');
+                .html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Iniciando sesión...');
 
             // Mostrar loading toast con tiempo mínimo para evitar flashes
             ToastUtils.loadingWithMinTime('Iniciando sesión...', () => {

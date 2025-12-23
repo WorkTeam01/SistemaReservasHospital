@@ -14,7 +14,7 @@ class Controller
      * @param string $view Ruta relativa de la vista (ej: 'auth/login')
      * @param array $data Datos asociativos para pasar a la vista
      */
-    protected function render($view, $data = [])
+    protected function render(string $view, array $data = []): void
     {
         // Extraer datos para que sean variables locales en la vista
         extract($data);
@@ -35,8 +35,19 @@ class Controller
      * @param string $view Ruta relativa de la vista (ej: 'dashboard/admin')
      * @param array $data Datos asociativos para pasar a la vista
      */
-    protected function renderWithLayout($view, $data = [])
+    protected function renderWithLayout(string $view, array $data = []): void
     {
+        // Obtener datos del usuario autenticado para todas las vistas
+        $user = Auth::user();
+
+        // Agregar datos del usuario al array de datos si no están presentes
+        if (!isset($data['userName'])) {
+            $data['userName'] = $user['name'] ?? 'Usuario';
+        }
+        if (!isset($data['userRole'])) {
+            $data['userRole'] = $user['role'] ?? 'Usuario';
+        }
+
         // Extraer datos para que sean variables locales en la vista
         extract($data);
 
@@ -44,6 +55,10 @@ class Controller
         $pageStyles = $data['pageStyles'] ?? [];
         $pageScripts = $data['pageScripts'] ?? [];
         $pageTitle = $data['pageTitle'] ?? 'Sistema de Reservas Hospital';
+
+        // Variables de usuario (ahora ya extraídas arriba)
+        $userName = $data['userName'];
+        $userRole = $data['userRole'];
 
         // Ruta física del archivo de vista
         $viewFile = __DIR__ . "/../../views/{$view}.php";
@@ -70,7 +85,7 @@ class Controller
      * 
      * @param string $path Ruta interna (ej: '/dashboard')
      */
-    protected function redirect($path)
+    protected function redirect(string $path)
     {
         // Asegurar que usamos URL_BASE si la ruta no es absoluta
         if (!str_starts_with($path, 'http')) {
@@ -86,7 +101,7 @@ class Controller
      * @param mixed $data Datos a devolver
      * @param int $status Código HTTP
      */
-    protected function json($data, $status = 200)
+    protected function json(mixed $data, int $status = 200)
     {
         header("Content-Type: application/json");
         http_response_code($status);

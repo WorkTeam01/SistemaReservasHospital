@@ -56,16 +56,40 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <div class="btn-group">
-                    <button class="btn btn-link nav-link px-2" data-widget="fullscreen">
-                        <i class="fas fa-expand-arrows-alt"></i>
-                    </button>
-                </div>
 
+                <!-- Fullscreen Button -->
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= URL_BASE; ?>/logout" role="button">
-                        <i class="fas fa-sign-out-alt"></i> Salir
+                    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
                     </a>
+                </li>
+
+                <!-- Separador visible solo en desktop -->
+                <li class="nav-item d-none d-md-block">
+                    <div class="border-left mt-2" style="height: 24px;"></div>
+                </li>
+
+                <!-- User Menu -->
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <span class="d-none d-md-inline mr-2"><?= $userName ?? 'Usuario'; ?></span>
+                        <i class="fas fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <!-- User image -->
+                        <li class="user-header">
+                            <img src="<?= URL_BASE ?>/img/user-default.jpg" class="img-circle elevation-2" alt="User Image" style="object-fit: cover; width: 90px; height: 90px;">
+                            <p>
+                                <?= $userName ?? 'Usuario'; ?>
+                                <small><?= ucfirst($userRole ?? 'Sin rol'); ?></small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <a href="<?= URL_BASE; ?>/perfil" class="btn btn-default btn-flat">Perfil</a>
+                            <a href="<?= URL_BASE; ?>/logout" class="btn btn-default btn-flat float-right">Cerrar Sesión</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>
