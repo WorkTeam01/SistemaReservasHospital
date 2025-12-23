@@ -311,6 +311,177 @@ $router->get('/login', function () {
 
 ---
 
+## 🔐 Sistema de Autenticación (Auth)
+
+### Clase Auth (`app/Core/Auth.php`)
+
+La clase `Auth` proporciona métodos estáticos para gestionar la autenticación de usuarios.
+
+#### Métodos Disponibles
+
+##### `Auth::generateCsrfToken()`
+
+Genera un token CSRF único para proteger contra ataques CSRF.
+
+```php
+$csrfToken = Auth::generateCsrfToken();
+// En el formulario HTML:
+<input type="hidden" name="csrf_token" value="<?= $csrfToken; ?>">
+```
+
+##### `Auth::validateCsrfToken($token)`
+
+Valida un token CSRF contra el almacenado en sesión.
+
+```php
+$csrfToken = $_POST['csrf_token'] ?? '';
+if (!Auth::validateCsrfToken($csrfToken)) {
+    $_SESSION['message'] = 'Token de seguridad inválido';
+    $_SESSION['icon'] = 'error';
+    $this->redirect('/login');
+    return;
+}
+```
+
+##### `Auth::login($user)`
+
+Inicia sesión para un usuario. Regenera el ID de sesión por seguridad.
+
+```php
+// $user debe ser un array con: user_id, role, name
+Auth::login($user);
+```
+
+##### `Auth::check()`
+
+Verifica si hay un usuario autenticado.
+
+```php
+if (Auth::check()) {
+    // Usuario está logueado
+}
+```
+
+##### `Auth::user()`
+
+Obtiene los datos del usuario actual de la sesión.
+
+```php
+$user = Auth::user();
+// Retorna: ['id' => ..., 'name' => ..., 'role' => ...]
+echo $user['name'];  // Nombre del usuario
+echo $user['role'];  // Rol del usuario (admin, doctor, receptionist)
+```
+
+##### `Auth::logout()`
+
+Cierra la sesión del usuario de forma segura.
+
+- Limpia todas las variables de sesión (`$_SESSION = []`)
+- Destruye la cookie de sesión
+- Destruye la sesión del servidor
+- Inicia una nueva sesión limpia para mensajes de redirección
+
+```php
+Auth::logout();
+$_SESSION['message'] = 'Has cerrado sesión correctamente';
+$this->redirect('/login');
+```
+
+### Flujo de Login Completo
+
+```php
+// 1. Mostrar formulario de login
+public function showLogin(): void
+{
+    Middleware::guest();  // Solo usuarios no autenticados
+    $csrfToken = Auth::generateCsrfToken();
+    
+    $this->render('auth/login', [
+        'pageTitle' => 'Iniciar Sesión',
+        'csrfToken' => $csrfToken
+    ]);
+}
+
+// 2. Procesar login
+public function login(): void
+{
+    // Validar CSRF
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    if (!Auth::validateCsrfToken($csrfToken)) {
+        $_SESSION['message'] = 'Token de seguridad inválido';
+        $_SESSION['icon'] = 'error';
+        $this->redirect('/login');
+        return;
+    }
+
+    // Obtener credenciales
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $password = $_POST['password'] ?? '';
+
+    // Buscar usuario
+    $user = $this->userModel->findByEmail($email);
+
+    // Verificar contraseña
+    if ($user && password_verify($password, $user['password'])) {
+        // Login exitoso
+        Auth::login($user);
+        $_SESSION['welcome_user'] = $user['name'];
+        $this->redirect('/dashboard');
+    } else {
+        $_SESSION['message'] = 'Credenciales incorrectas';
+        $_SESSION['icon'] = 'error';
+        $this->redirect('/login');
+    }
+}
+
+// 3. Cerrar sesión
+public function logout(): void
+{
+    Middleware::auth();  // Solo usuarios autenticados
+    Auth::logout();
+    $_SESSION['message'] = 'Has cerrado sesión correctamente';
+    $_SESSION['icon'] = 'success';
+    $this->redirect('/login');
+}
+```
+
+### Protección de Contraseñas
+
+**Siempre usar `password_hash()` y `password_verify()`:**
+
+```php
+// Al crear usuario
+$data = [
+    'password' => password_hash($_POST['password'], PASSWORD_BCRYPT)
+];
+
+// Al verificar login
+if (password_verify($password, $user['password'])) {
+    // Contraseña correcta
+}
+```
+
+### Datos de Usuario en Todas las Vistas
+
+**El sistema automáticamente proporciona `$userName` y `$userRole` en todas las vistas con layout:**
+
+```php
+// En el controlador (ya no necesitas pasar userName y userRole manualmente)
+$this->renderWithLayout('patients/index', [
+    'pageTitle' => 'Gestión de Pacientes',
+    'patients' => $this->patientModel->all()
+]);
+
+// En la vista (header.php automáticamente tiene acceso a)
+<?= $userName; ?>  // Nombre del usuario autenticado
+<?= $userRole; ?>  // Rol del usuario (admin, doctor, receptionist)
+```
+
+El método `renderWithLayout()` en `Controller.php` automáticamente obtiene los datos del usuario con `Auth::user()` y los pasa a todas las vistas.
+
+---
+
 ## 📝 Convenciones de Código
 
 ### Nombres de Archivos y Clases
@@ -786,11 +957,129 @@ $urlBase = URL_BASE; // Constante ya definida
 
 ---
 
+## 🚨 Manejo de Errores
+
+### Sistema de Errores HTTP
+
+El sistema implementa páginas personalizadas para los errores HTTP más comunes:
+
+#### Páginas Disponibles
+
+- **404** - Página no encontrada
+- **500** - Error interno del servidor
+- **503** - Servicio no disponible
+
+Todas las páginas usan un layout reutilizable (`views/errors/layout.php`) para mantener consistencia visual.
+
+### Clase ErrorHandler
+
+**Ubicación**: `app/Core/ErrorHandler.php`
+
+Es una clase helper que proporciona métodos convenientes para mostrar páginas de error. **No captura errores automáticamente**, solo centraliza la lógica de visualización.
+
+#### Métodos Disponibles
+
+```php
+// Mostrar error 404
+ErrorHandler::notFound();
+
+// Mostrar error 500
+ErrorHandler::serverError();
+
+// Mostrar error 503
+ErrorHandler::serviceUnavailable();
+
+// Error genérico
+ErrorHandler::showError(403);
+```
+
+### Uso en el Router
+
+El Router usa `ErrorHandler::notFound()` cuando no encuentra una ruta:
+
+```php
+// En app/Core/Router.php
+if ($callback) {
+    // Ejecutar callback
+} else {
+    ErrorHandler::notFound();
+}
+```
+
+### Ejemplo de Uso
+
+```php
+public function show($id)
+{
+    $patient = $this->patientModel->find($id);
+    
+    if (!$patient) {
+        // Mostrar 404 si no existe
+        ErrorHandler::notFound();
+    }
+    
+    $this->renderWithLayout('patients/show', [
+        'patient' => $patient
+    ]);
+}
+```
+
+### Manejo Manual de Errores
+
+Para errores en operaciones críticas, usa try-catch:
+
+```php
+public function processPayment()
+{
+    try {
+        $result = $this->paymentService->process();
+        
+        if (!$result) {
+            throw new \Exception("Payment failed");
+        }
+        
+        $_SESSION['message'] = 'Pago procesado';
+        $this->redirect('/payments');
+        
+    } catch (\Exception $e) {
+        // Log del error
+        error_log("Error en pago: " . $e->getMessage());
+        
+        // Mostrar página de error
+        ErrorHandler::serverError();
+    }
+}
+```
+
+### Modo Desarrollo vs Producción
+
+**Configurar en `.env`**:
+```env
+APP_ENV=development  # Muestra detalles técnicos en errores 500
+# APP_ENV=production # Oculta detalles técnicos
+```
+
+**Comportamiento**:
+- **Desarrollo**: Muestra mensaje, archivo y línea de error en página 500
+- **Producción**: Solo muestra mensaje genérico amigable al usuario
+
+### Documentación Completa
+
+📘 **[Guía Completa de Manejo de Errores](ERROR_HANDLING.md)** - Incluye:
+- Arquitectura del sistema de errores
+- Layout reutilizable
+- Personalización de páginas
+- Ejemplos de implementación
+
+---
+
 ## 📖 Documentación Adicional
 
 - 📘 [Ejemplos de Uso del Model](EJEMPLOS_MODEL.md)
-- 🚀 [Quick Start para ClickUp](CLICKUP_QUICK_START.md)
-- 📚 [README del Proyecto](../README.md)
+- 🔐 [Auth System - Guía Rápida](AUTH_QUICK_REFERENCE.md)
+- 🚨 [Sistema de Manejo de Errores](ERROR_HANDLING.md)
+- 📋 [Changelog](CHANGELOG.md)
+- 📚 [README del Proyecto](../../README.md)
 
 ---
 

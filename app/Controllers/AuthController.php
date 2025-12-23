@@ -23,7 +23,7 @@ class AuthController extends Controller
      * Muestra el formulario de login
      * Solo accesible para usuarios no autenticados (guests)
      */
-    public function showLogin()
+    public function showLogin(): void
     {
         Middleware::guest();
         $csrfToken = Auth::generateCsrfToken();
@@ -36,9 +36,9 @@ class AuthController extends Controller
 
     /**
      * Procesa el formulario de login
-     * Valida credenciales y crea sesión si son correctas
+     * Válida credencial y crea sesión si son correctas
      */
-    public function login()
+    public function login(): void
     {
         // Solo aceptar POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -93,22 +93,12 @@ class AuthController extends Controller
             $_SESSION['icon'] = 'error';
             $this->redirect('/login');
         }
-
-        // Limpiar TODAS las variables de sesión
-        $_SESSION = [];
-
-        // Destruir la cookie de sesión
-        if (isset($_COOKIE[session_name()])) {
-            setcookie(session_name(), '', time() - 3600, '/');
-        }
-        // Redirigir al login
-        $this->redirect('/login');
     }
 
     /**
      * Cierra la sesión del usuario actual
      */
-    public function logout()
+    public function logout(): void
     {
         // Verificar que el usuario esté autenticado
         Middleware::auth();

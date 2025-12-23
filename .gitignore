@@ -23,4 +23,3 @@ debug.log
 *.sql
 !database.sql
 /bash.exe.stackdump
-.github/sync-labels.sh

@@ -20,14 +20,13 @@ class DashboardController extends Controller
      * Muestra el dashboard según el rol del usuario
      * Redirige a la vista correspondiente (admin, doctor, receptionist)
      */
-    public function index()
+    public function index(): void
     {
         // Proteger ruta - solo usuarios autenticados
         Middleware::auth();
-        $userName = Auth::userName();
-
-        // Obtener rol del usuario desde sesión
-        $role = $_SESSION['user_role'];
+        $user = Auth::user();
+        $role = $user['role'];
+        $userName = $user['name'];
 
         // Obtener estadísticas del dashboard
         try {
@@ -55,6 +54,7 @@ class DashboardController extends Controller
                 $this->renderWithLayout('dashboard/admin', array_merge($data, [
                     'pageTitle' => 'Dashboard Administrador',
                     'userName' => $userName,
+                    'role' => $role,
                     'pageStyles' => ['css/modules/dashboard/dashboard.css'],
                     'pageScripts' => ['js/modules/dashboard/dashboard.js']
                 ]));
@@ -63,6 +63,7 @@ class DashboardController extends Controller
                 $this->renderWithLayout('dashboard/doctor', array_merge($data, [
                     'pageTitle' => 'Dashboard Doctor',
                     'userName' => $userName,
+                    'role' => $role,
                     'pageStyles' => ['css/modules/dashboard/dashboard.css'],
                     'pageScripts' => ['js/modules/dashboard/dashboard.js']
                 ]));
@@ -71,6 +72,7 @@ class DashboardController extends Controller
                 $this->renderWithLayout('dashboard/receptionist', array_merge($data, [
                     'pageTitle' => 'Dashboard Recepcionista',
                     'userName' => $userName,
+                    'role' => $role,
                     'pageStyles' => ['css/modules/dashboard/dashboard.css'],
                     'pageScripts' => ['js/modules/dashboard/dashboard.js']
                 ]));
