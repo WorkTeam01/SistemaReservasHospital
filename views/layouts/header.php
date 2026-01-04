@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/fontawesome/css/all.min.css">
     <!-- Theme style (AdminLTE) -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/lib/adminlte/adminlte.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/datatables/datatables.min.css">
+    <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/datatables/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/datatables/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="<?= URL_BASE; ?>/css/plugins/datatables/dataTables.bootstrap4.min.css">
     <!-- Custom style -->
     <link rel="stylesheet" href="<?= URL_BASE; ?>/css/core/style.css">
     <!-- Plugins (Select2, SweetAlert2, DataTables) -->
@@ -47,8 +52,8 @@
                 <!-- Logo visible solo en móvil -->
                 <li class="nav-item d-sm-none">
                     <a href="<?= URL_BASE; ?>" class="nav-link d-flex align-items-center">
-                        <img src="<?= URL_BASE; ?>/img/cita-medica.png" alt="Logo Hospital System"
-                            class="img-circle" style="width: 25px; height: 25px; margin-right: 8px;">
+                        <img src="<?= URL_BASE; ?>/img/cita-medica.png" alt="Logo Hospital System" class="img-circle"
+                            style="width: 25px; height: 25px; margin-right: 8px;">
                         <span class="brand-text">Hospital System</span>
                     </a>
                 </li>
@@ -78,7 +83,8 @@
                     <ul class="dropdown-menu dropdown-menu-right">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= URL_BASE ?>/img/user-default.jpg" class="img-circle elevation-2" alt="User Image" style="object-fit: cover; width: 90px; height: 90px;">
+                            <img src="<?= URL_BASE ?>/img/user-default.jpg" class="img-circle elevation-2"
+                                alt="User Image" style="object-fit: cover; width: 90px; height: 90px;">
                             <p>
                                 <?= $userName ?? 'Usuario'; ?>
                                 <small><?= ucfirst($userRole ?? 'Sin rol'); ?></small>
@@ -87,7 +93,8 @@
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <a href="<?= URL_BASE; ?>/perfil" class="btn btn-default btn-flat">Perfil</a>
-                            <a href="<?= URL_BASE; ?>/logout" class="btn btn-default btn-flat float-right">Cerrar Sesión</a>
+                            <a href="<?= URL_BASE; ?>/logout" class="btn btn-default btn-flat float-right">Cerrar
+                                Sesión</a>
                         </li>
                     </ul>
                 </li>

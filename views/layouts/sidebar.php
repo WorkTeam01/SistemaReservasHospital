@@ -61,7 +61,7 @@
 
                 <!-- Especialidades -->
                 <li class="nav-item">
-                    <a href="<?= URL_BASE; ?>/specialties" class="nav-link">
+                    <a href="<?= URL_BASE; ?>/especialidades" class="nav-link">
                         <i class="fas fa-stethoscope nav-icon"></i>
                         <p>Especialidades</p>
                     </a>
