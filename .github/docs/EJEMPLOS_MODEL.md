@@ -217,7 +217,7 @@ public function index()
     $data = [
         'pageTitle' => 'Gestión de Pacientes',
         'pageStyles' => ['css/modules/patients/patients.css'],
-        'pageScripts' => ['js/modules/patients/patients.js'],
+        'pageScripts' => ['js/modules/patients/patient-validation.js'],
         'patients' => $this->patientModel->all()
     ];
 
@@ -419,7 +419,7 @@ public function index()
             'css/plugins/datatables/datatables.min.css'
         ],
         'pageScripts' => [
-            'js/modules/patients/patients.js',
+            'js/modules/patients/patient-validation.js',
             'js/plugins/datatables/datatables.min.js'
         ],
         'patients' => $this->patientModel->all()
@@ -455,7 +455,7 @@ public function index()
     <script src=".../adminlte.min.js"></script>
 
     <!-- JS específicos de la página -->
-    <script src=".../js/modules/patients/patients.js"></script>
+    <script src=".../js/modules/patients/patient-validation.js"></script>
     <script src=".../js/plugins/datatables/datatables.min.js"></script>
 </body>
 ```

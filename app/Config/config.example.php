@@ -4,7 +4,8 @@
 define('URL_BASE', env('BASE_URL'));
 
 // Definir el entorno de la aplicación (development, production)
-define('APP_ENV', env('APP_ENV', 'production'));
+define('APP_ENV', env('APP_ENV', 'development'));
+define('VERSION', env('APP_VERSION', '1.0.0'));
 
 // Configurar reporte de errores según el entorno
 if (APP_ENV === 'development') {

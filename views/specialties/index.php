@@ -1,13 +1,13 @@
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
-        <div class="row mb-2">
+        <div class="row">
             <div class="col-sm-6">
                 <h1 class="m-0">Gestión de Especialidades</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="<?= URL_BASE ?>"><i class="fas fa-home"></i> Inicio</a></li>
                     <li class="breadcrumb-item active">Especialidades</li>
                 </ol>
             </div>
@@ -22,20 +22,22 @@
             <div class="col-md-8">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Listado de Especialidades Activas</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                data-target="#modal-create">
-                                <i class="fas fa-plus"></i> Nueva Especialidad
-                            </button>
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <h3 class="card-title">Listado de Especialidades</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#modal-create">
+                                    <i class="fas fa-plus"></i> Nueva Especialidad
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="specialtiesTable" class="table table-bordered table-striped">
+                        <table id="specialtiesTable" class="table table-bordered table-striped table-hover table-sm" style="visibility: hidden">
                             <thead>
                                 <tr>
                                     <th style="width: 50px">N°</th>
@@ -51,7 +53,7 @@
                                     <tr>
                                         <td><?= $counter++ ?></td>
                                         <td><?= htmlspecialchars($specialty['name']) ?></td>
-                                        <td>
+                                        <td class="text-center">
                                             <?php if ($specialty['is_active']): ?>
                                                 <span class="badge badge-success">Activo</span>
                                             <?php else: ?>
@@ -120,7 +122,7 @@
                                 </li>
                                 <li>
                                     <i class="fas fa-check text-info mr-1"></i>
-                                    Al eliminar una especialidad, esta se <strong>desactiva</strong> pero se
+                                    Al eliminar una especialidad, esta se <strong>desactiva</strong>, pero se
                                     mantiene el historial.
                                 </li>
                             </ul>
@@ -134,7 +136,7 @@
 
 <!-- Modal Create -->
 <div class="modal fade" id="modal-create">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h4 class="modal-title">Nueva Especialidad</h4>
@@ -146,7 +148,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="name">Nombre de la Especialidad</label>
-                        <input type="text" class="form-control" name="name" placeholder="Ej: Cardiología" required>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Ej: Cardiología" required>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -162,7 +164,7 @@
 
 <!-- Modal Edit -->
 <div class="modal fade" id="modal-edit">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-success">
                 <h4 class="modal-title">Editar Especialidad</h4>

@@ -124,10 +124,10 @@ $(document).ready(function () {
         ],
         "language": {
             "sProcessing": "Procesando...",
-            "sLengthMenu": "Mostrar MENU registros",
+            "sLengthMenu": "Mostrar _MENU_ registros",
             "sZeroRecords": "No se encontraron resultados",
             "sEmptyTable": "Ningún dato disponible en esta tabla",
-            "sInfo": "Mostrando registros del START al END de un total de TOTAL Tipos de pago",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ Tipos de pago",
             "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 Tipos de pago",
             "sInfoFiltered": "(filtrado de un total de MAX Tipos de pago)",
             "sInfoPostFix": "",

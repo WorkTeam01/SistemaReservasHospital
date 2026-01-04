@@ -229,7 +229,7 @@ $data = [
         'css/plugins/datatables/datatables.min.css'
     ],
     'pageScripts' => [
-        'js/modules/patients/patients.js',
+        'js/modules/patients/patient-validation.js',
         'js/plugins/datatables/datatables.min.js'
     ],
     'patients' => $patientModel->all()
@@ -741,7 +741,7 @@ class PatientController extends Controller
         $data = [
             'pageTitle' => 'Gestión de Pacientes',
             'pageStyles' => ['css/modules/patients/patients.css'],
-            'pageScripts' => ['js/modules/patients/patients.js'],
+            'pageScripts' => ['js/modules/patients/patient-validation.js'],
             'patients' => $this->patientModel->all()  // Usa método CRUD heredado
         ];
         $this->renderWithLayout('patients/index', $data);

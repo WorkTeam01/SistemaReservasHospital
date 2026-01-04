@@ -59,8 +59,11 @@ class SpecialtyController extends Controller
             }
         }
 
+        // jQuery Validate 'remote' espera:
+        // - true si la validación es exitosa (nombre disponible)
+        // - false si la validación falla (nombre ya existe)
         header('Content-Type: application/json');
-        echo json_encode(['exists' => $exists]);
+        echo json_encode(!$exists); // Invertir: true si NO existe, false si existe
     }
 
     /**

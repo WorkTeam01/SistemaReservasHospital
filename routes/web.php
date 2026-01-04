@@ -31,5 +31,6 @@ $router->get('/especialidades/show', [\App\Controllers\SpecialtyController::clas
 // --- Rutas de Pacientes ---
 $router->get('/pacientes', [\App\Controllers\PatientController::class, 'index']);
 $router->get('/pacientes/crear', [\App\Controllers\PatientController::class, 'showCreate']);
-$router->post('/pacientes/crear', [\App\Controllers\PatientController::class, 'create']);
+$router->post('/pacientes/store', [\App\Controllers\PatientController::class, 'store']);
+// AJAX
 $router->get('/pacientes/check-dni', [\App\Controllers\PatientController::class, 'checkDni']);

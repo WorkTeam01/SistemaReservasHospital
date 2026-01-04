@@ -9,32 +9,6 @@
 // Variable global para prevenir envíos múltiples
 let isSubmitting = false;
 
-// ========================================================================
-// MÉTODO PERSONALIZADO: Verificar Nombre Único
-// ========================================================================
-$.validator.addMethod("checkNameExists", function (value, element) {
-    let isUnique = false;
-    const id = $('#edit-id').val(); // Para edición
-
-    $.ajax({
-        url: URL_BASE + '/especialidades/check-name',
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            name: value,
-            id: id || null
-        },
-        async: false,
-        success: function (response) {
-            isUnique = !response.exists;
-        },
-        error: function () {
-            isUnique = true;
-        }
-    });
-    return isUnique;
-}, "La especialidad ya existe");
-
 $(document).ready(function () {
 
     // ========================================================================
@@ -45,13 +19,25 @@ $(document).ready(function () {
             name: {
                 required: true,
                 maxlength: 100,
-                checkNameExists: true
+                remote: {
+                    url: URL_BASE + '/especialidades/check-name',
+                    type: 'POST',
+                    data: {
+                        name: function() {
+                            return $('#name').val();
+                        },
+                        id: function() {
+                            return null; // No hay ID en creación
+                        }
+                    }
+                }
             }
         },
         messages: {
             name: {
                 required: 'El nombre es obligatorio',
-                maxlength: 'El nombre no puede exceder 100 caracteres'
+                maxlength: 'El nombre no puede exceder 100 caracteres',
+                remote: 'La especialidad ya existe'
             }
         },
         errorElement: 'span',
@@ -78,13 +64,25 @@ $(document).ready(function () {
             name: {
                 required: true,
                 maxlength: 100,
-                checkNameExists: true
+                remote: {
+                    url: URL_BASE + '/especialidades/check-name',
+                    type: 'POST',
+                    data: {
+                        name: function() {
+                            return $('#edit-name').val();
+                        },
+                        id: function() {
+                            return $('#edit-id').val(); // Incluir ID para excluir en validación
+                        }
+                    }
+                }
             }
         },
         messages: {
             name: {
                 required: 'El nombre es obligatorio',
-                maxlength: 'El nombre no puede exceder 100 caracteres'
+                maxlength: 'El nombre no puede exceder 100 caracteres',
+                remote: 'La especialidad ya existe'
             }
         },
         errorElement: 'span',
@@ -244,7 +242,7 @@ $(document).ready(function () {
         const id = $(form).find('input[name="id"]').val();
         const status = $(form).find('input[name="status"]').val(); // 1 = Activo, 0 = Inactivo
 
-        const isDeactivating = (status == 1);
+        const isDeactivating = (status === '1');
         const title = isDeactivating ? '¿Desactivar especialidad?' : '¿Activar especialidad?';
         const text = isDeactivating
             ? "La especialidad no estará disponible para nuevas citas."
