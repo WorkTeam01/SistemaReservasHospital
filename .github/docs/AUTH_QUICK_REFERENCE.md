@@ -116,6 +116,11 @@ public function logout(): void
     
     Auth::logout();
     
+    // Iniciar nueva sesión para mensajes flash
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
     $_SESSION['message'] = 'Has cerrado sesión correctamente';
     $_SESSION['icon'] = 'success';
     
@@ -125,10 +130,12 @@ public function logout(): void
 
 **¿Qué hace internamente?**
 
-1. Limpia todas las variables de sesión (`$_SESSION = []`)
-2. Destruye la cookie de sesión del navegador
-3. Destruye la sesión del servidor (`session_destroy()`)
-4. Inicia una nueva sesión limpia para mensajes
+1. Verifica que la sesión esté activa (`session_status() === PHP_SESSION_ACTIVE`)
+2. Limpia todas las variables de sesión (`$_SESSION = []`)
+3. Destruye la cookie de sesión del navegador con `setcookie()` y tiempo expirado
+4. Destruye la sesión del servidor (`session_destroy()`)
+
+**⚠️ Importante**: Después de `Auth::logout()`, necesitas iniciar una nueva sesión si quieres usar mensajes flash, ya que la sesión anterior fue completamente destruida
 
 ---
 

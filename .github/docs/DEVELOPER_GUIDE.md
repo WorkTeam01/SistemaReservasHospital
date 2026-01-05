@@ -957,6 +957,349 @@ $urlBase = URL_BASE; // Constante ya definida
 
 ---
 
+## 🏥 Módulo de Pacientes - Ejemplo Completo
+
+### Estructura del Módulo
+
+El módulo de pacientes es un ejemplo completo de CRUD con diseño moderno, validación asíncrona y arquitectura RESTful.
+
+#### Rutas RESTful
+
+```php
+// routes/web.php
+
+// Listado de pacientes
+$router->get('/pacientes', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->index();
+});
+
+// Mostrar formulario de creación (GET)
+$router->get('/pacientes/crear', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->showCreate();
+});
+
+// Procesar creación de paciente (POST)
+$router->post('/pacientes/store', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->store();
+});
+
+// Validación remota AJAX
+$router->post('/pacientes/check-dni', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->checkDni();
+});
+```
+
+**Convención de rutas**:
+- `GET /recurso` - Listado
+- `GET /recurso/crear` - Formulario de creación
+- `POST /recurso/store` - Guardar registro
+- `GET /recurso/editar/:id` - Formulario de edición
+- `POST /recurso/update/:id` - Actualizar registro
+- `POST /recurso/delete/:id` - Eliminar registro
+
+#### Controlador
+
+```php
+<?php
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\Middleware;
+use App\Models\Patient;
+
+class PatientController extends Controller
+{
+    private $patientModel;
+
+    public function __construct()
+    {
+        $this->patientModel = new Patient();
+    }
+
+    /**
+     * Mostrar formulario de creación
+     */
+    public function showCreate()
+    {
+        Middleware::auth();
+        $this->renderWithLayout('patients/create', [
+            'pageTitle' => 'Registrar Nuevo Paciente',
+            'pageScripts' => ['js/modules/patients/patient-validation.js']
+        ]);
+    }
+
+    /**
+     * Guardar nuevo paciente
+     */
+    public function store()
+    {
+        Middleware::auth();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['message'] = 'Método no permitido';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/pacientes/crear');
+            return;
+        }
+
+        // Sanitizar inputs
+        $data = [
+            'name' => trim($_POST['name'] ?? ''),
+            'last_name' => trim($_POST['last_name'] ?? ''),
+            'dni' => trim($_POST['dni'] ?? ''),
+            'phone' => trim($_POST['phone'] ?? ''),
+            'email' => !empty($_POST['email']) ? trim($_POST['email']) : null,
+            'birth_date' => !empty($_POST['birth_date']) ? $_POST['birth_date'] : null,
+            'address' => !empty($_POST['address']) ? trim($_POST['address']) : null,
+            'is_active' => 1
+        ];
+
+        // Guardar paciente
+        try {
+            $result = $this->patientModel->create($data);
+
+            if ($result) {
+                $_SESSION['message'] = 'Paciente registrado correctamente';
+                $_SESSION['icon'] = 'success';
+                $this->redirect('/pacientes');
+            } else {
+                $_SESSION['message'] = 'No se pudo registrar el paciente';
+                $_SESSION['icon'] = 'error';
+                $this->redirect('/pacientes/crear');
+            }
+        } catch (\Exception $e) {
+            $_SESSION['message'] = 'Error al registrar paciente: ' . $e->getMessage();
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/pacientes/crear');
+        }
+    }
+
+    /**
+     * Validación remota AJAX para DNI único
+     */
+    public function checkDni()
+    {
+        header('Content-Type: application/json');
+        
+        $dni = $_POST['dni'] ?? '';
+        $exists = $this->patientModel->dniExists($dni);
+        
+        // jQuery Validate espera 'true' para válido, 'false' para inválido
+        echo json_encode(!$exists);
+        exit;
+    }
+}
+```
+
+#### Modelo
+
+```php
+<?php
+namespace App\Models;
+
+use App\Core\Model;
+
+class Patient extends Model
+{
+    protected $table = 'patients';
+    protected $primaryKey = 'patient_id';
+
+    // Ya tiene disponibles: all(), find(), create(), update(), delete()
+
+    /**
+     * Verificar si un DNI ya existe
+     */
+    public function dniExists(string $dni, ?int $excludeId = null): bool
+    {
+        $conditions = ['dni' => $dni];
+        
+        if ($excludeId) {
+            // Para edición: excluir el registro actual
+            $sql = "SELECT COUNT(*) as count FROM {$this->table} 
+                    WHERE dni = :dni AND {$this->primaryKey} != :id";
+            $stmt = $this->query($sql, ['dni' => $dni, 'id' => $excludeId]);
+        } else {
+            $sql = "SELECT COUNT(*) as count FROM {$this->table} WHERE dni = :dni";
+            $stmt = $this->query($sql, ['dni' => $dni]);
+        }
+        
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result['count'] > 0;
+    }
+
+    /**
+     * Obtener pacientes activos
+     */
+    public function getActivePatients(): array
+    {
+        return $this->where(['is_active' => 1]);
+    }
+}
+```
+
+#### Validación Asíncrona con jQuery Validate
+
+**Problema**: Validación síncrona bloquea el hilo principal del navegador (warning en consola).
+
+**Solución**: Usar `submitHandler` para procesar el formulario de forma asíncrona.
+
+```javascript
+// public/js/modules/patients/patient-validation.js
+
+$(document).ready(function () {
+    $('#formPatient').validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            last_name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            dni: {
+                required: true,
+                digits: true,
+                minlength: 5,
+                maxlength: 20,
+                // Validación remota asíncrona
+                remote: {
+                    url: BASE_URL + '/pacientes/check-dni',
+                    type: 'POST',
+                    data: {
+                        dni: function() {
+                            return $('#dni').val();
+                        }
+                    }
+                }
+            },
+            phone: {
+                required: true,
+                minlength: 7,
+                maxlength: 20
+            },
+            email: {
+                email: true,
+                maxlength: 100
+            },
+            birth_date: {
+                required: true,
+                date: true
+            }
+        },
+        messages: {
+            name: {
+                required: 'Por favor ingrese el nombre del paciente',
+                minlength: 'El nombre debe tener al menos 2 caracteres',
+                maxlength: 'El nombre no debe exceder 100 caracteres'
+            },
+            dni: {
+                required: 'Por favor ingrese el DNI/CI',
+                digits: 'El DNI debe contener solo números',
+                remote: 'Este DNI ya está registrado'
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        // ✅ Procesar submit de forma asíncrona
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+});
+```
+
+**Ventajas de este enfoque**:
+- ✅ No bloquea el hilo principal del navegador
+- ✅ Validación remota funciona correctamente
+- ✅ Mensajes de error en tiempo real
+- ✅ No genera warnings en consola
+
+#### Vista con Diseño de Dos Columnas
+
+La vista de creación utiliza un **diseño de dos columnas**:
+- **Columna izquierda (8/12)**: Formulario principal con cards colapsables
+- **Columna derecha (4/12)**: Guía de registro y consejos
+
+```php
+<!-- views/patients/create.php -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Columna Principal: Formulario -->
+            <div class="col-md-8">
+                <form id="formPatient" action="<?= BASE_URL ?>/pacientes/store" method="post">
+                    
+                    <!-- Card: Datos Básicos -->
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-user"></i> Datos Básicos</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Campos del formulario -->
+                        </div>
+                    </div>
+
+                    <!-- Card: Datos de Contacto -->
+                    <div class="card card-primary card-outline">
+                        <!-- ... -->
+                    </div>
+
+                    <!-- Botones de acción en el footer de la última card -->
+                </form>
+            </div>
+
+            <!-- Columna Lateral: Guía y Consejos -->
+            <div class="col-md-4">
+                <div class="card card-info card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-question-circle"></i> Guía de Registro</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Información contextual -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+```
+
+**Características del diseño**:
+- ✅ Cards colapsables para mejor organización
+- ✅ Breadcrumb completo para navegación
+- ✅ Input groups con iconos de Font Awesome
+- ✅ Indicadores visuales de campos obligatorios (*)
+- ✅ Guía contextual en la columna lateral
+- ✅ Diseño responsive (se apila en móviles)
+- ✅ 100% AdminLTE y Bootstrap (sin CSS personalizado)
+
+---
+
 ## 🚨 Manejo de Errores
 
 ### Sistema de Errores HTTP
@@ -1083,4 +1426,4 @@ APP_ENV=development  # Muestra detalles técnicos en errores 500
 
 ---
 
-_Última actualización: Diciembre 2025_
+_Última actualización: Enero 2025_

@@ -663,6 +663,393 @@ $(document).ready(function () {
 
 ---
 
+## 🏥 Ejemplo Completo: Módulo de Pacientes
+
+### Modelo Patient con Métodos Personalizados
+
+```php
+<?php
+namespace App\Models;
+
+use App\Core\Model;
+use PDO;
+
+class Patient extends Model
+{
+    protected $table = 'patients';
+    protected $primaryKey = 'patient_id';
+
+    // Heredados: all(), find(), create(), update(), delete(), count(), where()
+
+    /**
+     * Verificar si un DNI ya existe en la base de datos
+     * @param string $dni DNI a verificar
+     * @param int|null $excludeId ID del paciente a excluir (para edición)
+     * @return bool True si existe, False si no existe
+     */
+    public function dniExists(string $dni, ?int $excludeId = null): bool
+    {
+        if ($excludeId) {
+            // Para edición: excluir el registro actual
+            $sql = "SELECT COUNT(*) as count FROM {$this->table} 
+                    WHERE dni = :dni AND {$this->primaryKey} != :id";
+            $stmt = $this->query($sql, ['dni' => $dni, 'id' => $excludeId]);
+        } else {
+            // Para creación: buscar cualquier coincidencia
+            $sql = "SELECT COUNT(*) as count FROM {$this->table} WHERE dni = :dni";
+            $stmt = $this->query($sql, ['dni' => $dni]);
+        }
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['count'] > 0;
+    }
+
+    /**
+     * Obtener solo pacientes activos
+     * @return array Lista de pacientes activos
+     */
+    public function getActivePatients(): array
+    {
+        return $this->where(['is_active' => 1]);
+    }
+
+    /**
+     * Buscar pacientes por nombre o DNI
+     * @param string $search Término de búsqueda
+     * @return array Pacientes encontrados
+     */
+    public function searchPatients(string $search): array
+    {
+        $sql = "SELECT * FROM {$this->table} 
+                WHERE (name LIKE :search OR last_name LIKE :search OR dni LIKE :search) 
+                AND is_active = 1
+                ORDER BY name ASC";
+        
+        $stmt = $this->query($sql, ['search' => "%{$search}%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtener historial de citas de un paciente
+     * @param int $patientId ID del paciente
+     * @return array Citas del paciente
+     */
+    public function getAppointmentHistory(int $patientId): array
+    {
+        $sql = "SELECT 
+                    a.appointment_id, 
+                    a.date_time, 
+                    a.status,
+                    CONCAT(u.name, ' ', u.last_name) as doctor_name,
+                    s.name as specialty_name
+                FROM appointments a
+                INNER JOIN users u ON a.doctor_id = u.user_id
+                INNER JOIN specialties s ON a.specialty_id = s.specialty_id
+                WHERE a.patient_id = :patient_id
+                ORDER BY a.date_time DESC";
+        
+        $stmt = $this->query($sql, ['patient_id' => $patientId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+```
+
+### Controlador PatientController
+
+```php
+<?php
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\Middleware;
+use App\Models\Patient;
+
+class PatientController extends Controller
+{
+    private $patientModel;
+
+    public function __construct()
+    {
+        $this->patientModel = new Patient();
+    }
+
+    /**
+     * Listar todos los pacientes
+     */
+    public function index()
+    {
+        Middleware::auth();
+
+        $patients = $this->patientModel->getActivePatients();
+
+        $this->renderWithLayout('patients/index', [
+            'pageTitle' => 'Lista de Pacientes',
+            'patients' => $patients,
+            'pageScripts' => ['js/modules/patients/datatable-patients.js']
+        ]);
+    }
+
+    /**
+     * Mostrar formulario de creación
+     */
+    public function showCreate()
+    {
+        Middleware::auth();
+
+        $this->renderWithLayout('patients/create', [
+            'pageTitle' => 'Registrar Nuevo Paciente',
+            'pageScripts' => ['js/modules/patients/patient-validation.js']
+        ]);
+    }
+
+    /**
+     * Guardar nuevo paciente
+     */
+    public function store()
+    {
+        Middleware::auth();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['message'] = 'Método no permitido';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/pacientes/crear');
+            return;
+        }
+
+        // Sanitizar y validar inputs
+        $data = [
+            'name' => trim($_POST['name'] ?? ''),
+            'last_name' => trim($_POST['last_name'] ?? ''),
+            'dni' => trim($_POST['dni'] ?? ''),
+            'phone' => trim($_POST['phone'] ?? ''),
+            'email' => !empty($_POST['email']) ? trim($_POST['email']) : null,
+            'birth_date' => !empty($_POST['birth_date']) ? $_POST['birth_date'] : null,
+            'address' => !empty($_POST['address']) ? trim($_POST['address']) : null,
+            'is_active' => 1
+        ];
+
+        // Guardar paciente
+        try {
+            $result = $this->patientModel->create($data);
+
+            if ($result) {
+                $_SESSION['message'] = 'Paciente registrado correctamente';
+                $_SESSION['icon'] = 'success';
+                $this->redirect('/pacientes');
+            } else {
+                $_SESSION['message'] = 'No se pudo registrar el paciente';
+                $_SESSION['icon'] = 'error';
+                $this->redirect('/pacientes/crear');
+            }
+        } catch (\Exception $e) {
+            $_SESSION['message'] = 'Error al registrar paciente: ' . $e->getMessage();
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/pacientes/crear');
+        }
+    }
+
+    /**
+     * Validación remota AJAX para DNI único
+     * Usado por jQuery Validate
+     */
+    public function checkDni()
+    {
+        header('Content-Type: application/json');
+        
+        $dni = $_POST['dni'] ?? '';
+        $exists = $this->patientModel->dniExists($dni);
+        
+        // jQuery Validate espera 'true' para válido, 'false' para inválido
+        echo json_encode(!$exists);
+        exit;
+    }
+
+    /**
+     * Buscar pacientes vía AJAX
+     */
+    public function search()
+    {
+        header('Content-Type: application/json');
+        Middleware::auth();
+
+        $search = $_GET['q'] ?? '';
+        $patients = $this->patientModel->searchPatients($search);
+
+        echo json_encode($patients);
+        exit;
+    }
+
+    /**
+     * Ver detalle de un paciente
+     */
+    public function show($id)
+    {
+        Middleware::auth();
+
+        $patient = $this->patientModel->find($id);
+
+        if (!$patient) {
+            $_SESSION['message'] = 'Paciente no encontrado';
+            $_SESSION['icon'] = 'error';
+            $this->redirect('/pacientes');
+            return;
+        }
+
+        $appointments = $this->patientModel->getAppointmentHistory($id);
+
+        $this->renderWithLayout('patients/show', [
+            'pageTitle' => 'Detalle del Paciente',
+            'patient' => $patient,
+            'appointments' => $appointments
+        ]);
+    }
+}
+```
+
+### Validación JavaScript con jQuery Validate
+
+```javascript
+// public/js/modules/patients/patient-validation.js
+
+$(document).ready(function () {
+    $('#formPatient').validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            last_name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            dni: {
+                required: true,
+                digits: true,
+                minlength: 5,
+                maxlength: 20,
+                // ✅ Validación remota asíncrona
+                remote: {
+                    url: BASE_URL + '/pacientes/check-dni',
+                    type: 'POST',
+                    data: {
+                        dni: function() {
+                            return $('#dni').val();
+                        }
+                    }
+                }
+            },
+            phone: {
+                required: true,
+                minlength: 7,
+                maxlength: 20
+            },
+            email: {
+                email: true,
+                maxlength: 100
+            },
+            birth_date: {
+                required: true,
+                date: true
+            }
+        },
+        messages: {
+            name: {
+                required: 'Por favor ingrese el nombre del paciente',
+                minlength: 'El nombre debe tener al menos 2 caracteres',
+                maxlength: 'El nombre no debe exceder 100 caracteres'
+            },
+            last_name: {
+                required: 'Por favor ingrese el apellido del paciente',
+                minlength: 'El apellido debe tener al menos 2 caracteres'
+            },
+            dni: {
+                required: 'Por favor ingrese el DNI/CI',
+                digits: 'El DNI debe contener solo números',
+                remote: 'Este DNI ya está registrado en el sistema'
+            },
+            phone: {
+                required: 'Por favor ingrese el teléfono',
+                minlength: 'El teléfono debe tener al menos 7 dígitos'
+            },
+            email: {
+                email: 'Por favor ingrese un email válido'
+            },
+            birth_date: {
+                required: 'Por favor ingrese la fecha de nacimiento',
+                date: 'Formato de fecha inválido'
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        // ✅ Submit asíncrono (evita warning en consola)
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+});
+```
+
+**Nota importante**: El uso de `submitHandler` evita el warning "Synchronous XMLHttpRequest on the main thread is deprecated" que aparecía con la validación remota.
+
+### Rutas en web.php
+
+```php
+// Listado
+$router->get('/pacientes', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->index();
+});
+
+// Formulario creación
+$router->get('/pacientes/crear', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->showCreate();
+});
+
+// Guardar paciente
+$router->post('/pacientes/store', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->store();
+});
+
+// Validación AJAX DNI
+$router->post('/pacientes/check-dni', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->checkDni();
+});
+
+// Búsqueda AJAX
+$router->get('/pacientes/search', function () {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->search();
+});
+
+// Ver detalle
+$router->get('/pacientes/ver/:id', function ($id) {
+    Middleware::auth();
+    $controller = new PatientController();
+    $controller->show($id);
+});
+```
+
+---
+
 ## ✅ Ventajas del Nuevo Sistema
 
 1. ✅ **Menos código repetitivo** - CRUD genérico en Model base
@@ -690,4 +1077,4 @@ $(document).ready(function () {
 
 ---
 
-_Última actualización: Diciembre 2025_
+_Última actualización: Enero 2025_
