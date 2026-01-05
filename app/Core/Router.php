@@ -49,7 +49,7 @@ class Router
         $callback = $this->routes[$method][$path] ?? false;
 
         if ($callback) {
-            // Si es un Closure (función anónima), ejecutarlo directamente
+            // Sí es un Closure (función anónima), ejecutarlo directamente
             if ($callback instanceof \Closure) {
                 $callback();
             }
@@ -73,8 +73,7 @@ class Router
             }
         } else {
             // 404 - Página no encontrada
-            http_response_code(404);
-            require_once __DIR__ . '/../../views/errors/404.php';
+            ErrorHandler::notFound();
         }
     }
 }

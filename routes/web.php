@@ -1,24 +1,36 @@
 <?php
 
-use App\Core\Middleware;
+use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
 
-// --- Definición de Rutas ---
+// --- Rutas de Autenticación ---
 
-// Dashboard (Ruta principal)
-$router->get('/', function () {
-    $controller = new \App\Controllers\DashboardController();
-    $controller->index();
-});
+// Mostrar formulario de login
+$router->get('/login', [AuthController::class, 'showLogin']);
 
-// Login Demo
-$router->get('/login-demo', function () {
-    Middleware::guest(); // Solo invitados
-    echo "<h1>Login Page (Use AuthController)</h1>";
-});
+// Procesar login
+$router->post('/login', [AuthController::class, 'login']);
+//Cerrar sesión
+$router->get('/logout', [AuthController::class, 'logout']);
 
-// Logout
-$router->get('/logout', function () {
-    session_destroy();
-    header('Location: ' . URL_BASE . '/login-demo');
-    exit;
-});
+// --- Rutas Protegidas ---
+
+// Dashboard principal (redirige según rol)
+$router->get('/', [DashboardController::class, 'index']);
+$router->get('/dashboard', [DashboardController::class, 'index']);
+
+// --- Rutas de Especialidades ---
+$router->get('/especialidades', [\App\Controllers\SpecialtyController::class, 'index']);
+$router->post('/especialidades/crear', [\App\Controllers\SpecialtyController::class, 'store']);
+$router->post('/especialidades/editar', [\App\Controllers\SpecialtyController::class, 'update']);
+$router->post('/especialidades/toggle', [\App\Controllers\SpecialtyController::class, 'toggle']);
+// AJAX
+$router->post('/especialidades/check-name', [\App\Controllers\SpecialtyController::class, 'checkName']);
+$router->get('/especialidades/show', [\App\Controllers\SpecialtyController::class, 'show']);
+
+// --- Rutas de Pacientes ---
+$router->get('/pacientes', [\App\Controllers\PatientController::class, 'index']);
+$router->get('/pacientes/crear', [\App\Controllers\PatientController::class, 'showCreate']);
+$router->post('/pacientes/store', [\App\Controllers\PatientController::class, 'store']);
+// AJAX
+$router->get('/pacientes/check-dni', [\App\Controllers\PatientController::class, 'checkDni']);

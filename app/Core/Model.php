@@ -19,7 +19,17 @@ abstract class Model
     public function __construct()
     {
         // Obtener la conexión del Singleton
-        $this->db = Database::getInstance()->getConnection();
+        //$this->db = Database::getInstance()->getConnection();
+
+
+        // Obtener el Singleton de la base de datos
+        $dbInstance = Database::getInstance();
+        $this->db = $dbInstance->getConnection();
+
+        // Verificar si la conexión fue exitosa
+        if ($this->db === null) {
+            die("Error crítico: No se pudo establecer la conexión con la base de datos. <br> Detalle: " . $dbInstance->getError());
+        }
     }
 
     /**

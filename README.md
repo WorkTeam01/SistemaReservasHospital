@@ -93,8 +93,11 @@ SistemaReservasHospital/
 │   ├── js/
 │   └── img/
 ├── vendor/              # Librerías de terceros
+├── .gitignore           # Archivos ignorados por Git
+├── LICENSE              # Licencia del proyecto
+├── README.md            # Documentación principal
 ├── database.sql         # Esquema de BD
-└── .env                # Variables de entorno
+└── .env.example         # Variables de entorno de ejemplo
 ```
 
 ---
@@ -103,7 +106,7 @@ SistemaReservasHospital/
 
 ### Para Desarrolladores
 
-📖 **[Guía de Desarrollo Completa](.github/DEVELOPER_GUIDE.md)**
+📖 **[Guía de Desarrollo Completa](.github/docs/DEVELOPER_GUIDE.md)**
 
 Incluye:
 
@@ -113,24 +116,66 @@ Incluye:
 - Sistema de rutas y middleware
 - Buenas prácticas
 
+🔐 **[Auth System - Guía Rápida](.github/docs/AUTH_QUICK_REFERENCE.md)**
+
+Referencia rápida del sistema de autenticación:
+
+- Métodos disponibles (login, logout, CSRF)
+- Middleware de protección
+- Patrones comunes
+- Checklist de seguridad
+
+📋 **[Changelog](CHANGELOG.md)**
+
+Historial detallado de cambios, mejoras y correcciones del sistema.
+
+🚨 **[Sistema de Manejo de Errores](.github/docs/ERROR_HANDLING.md)**
+
+Guía completa del manejo de errores:
+
+- Páginas personalizadas (404, 500, 503)
+- Captura automática de excepciones
+- Modo desarrollo vs producción
+- Logging de errores
+
 ### Características Implementadas
 
 - ✅ **Arquitectura MVC** - Separación clara de responsabilidades
-- ✅ **Sistema de Rutas** - Router personalizado con middleware
+- ✅ **Sistema de Rutas** - Router personalizado con middleware y rutas RESTful
 - ✅ **Autoloader PSR-4** - Carga automática de clases
 - ✅ **Layouts Reutilizables** - Sistema de plantillas (header, sidebar, footer)
-- ✅ **Dashboard Administrativo** - Panel con estadísticas en tiempo real
-- ✅ **Middleware de Autenticación** - Protección de rutas
-- ✅ **Páginas de Error** - 404 personalizado
-- ✅ **Base de Datos** - PDO con prepared statements
+- ✅ **Dashboard Administrativo** - Panel con estadísticas en tiempo real por rol
+- ✅ **Sistema de Autenticación Completo**:
+  - Login con validación de credenciales
+  - Protección CSRF con tokens
+  - Logout seguro mejorado (limpia sesión completa, cookies y regenera ID)
+  - Datos de usuario automáticos en todas las vistas
+  - Información de rol visible en menú de usuario
+- ✅ **Middleware de Autenticación** - Protección de rutas (auth, guest, admin)
+- ✅ **Gestión de Pacientes**:
+  - Formulario de creación con diseño moderno de dos columnas
+  - Validación de datos con jQuery Validate (asíncrona)
+  - Cards colapsables organizadas por secciones
+  - Guía lateral con consejos y ayuda contextual
+  - Campos: Nombre, Apellido, DNI, Teléfono, Email, Fecha de Nacimiento, Dirección
+- ✅ **Sistema de Manejo de Errores Completo**:
+  - Páginas personalizadas (404, 500, 503) con diseño AdminLTE
+  - Layout reutilizable para todas las páginas de error
+  - ErrorHandler helper class para captura automática
+  - Modo desarrollo vs producción
+  - Integración automática con el Router
+- ✅ **Base de Datos** - PDO con prepared statements y transacciones
+- ✅ **Mensajes Flash** - Sistema de notificaciones con SweetAlert2
+- ✅ **UI/UX Consistente** - Diseño 100% AdminLTE y Bootstrap (sin CSS conflictivo)
 
 ### En Desarrollo
 
+- 🚧 Listado completo de Pacientes con DataTables (RF04)
+- 🚧 Edición y actualización de Pacientes
 - 🚧 Gestión de Usuarios (Doctores, Recepcionistas, Admins)
-- 🚧 Gestión de Pacientes
 - 🚧 Agendamiento de Citas Médicas
 - 🚧 Calendario de Citas
-- 🚧 Gestión de Especialidades
+- 🚧 Gestión completa de Especialidades
 - 🚧 Sistema de Reportes
 
 ---
@@ -160,11 +205,11 @@ Incluye:
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
 
-**Consulta la [Guía de Desarrollo](.github/DEVELOPER_GUIDE.md) antes de contribuir.**
+**Consulta la [Guía de Desarrollo](.github/docs/DEVELOPER_GUIDE.md) antes de contribuir.**
 
 ### 🏷️ Sistema de Labels
 
-El proyecto usa un sistema organizado de labels para issues y PRs:
+El proyecto usa un sistema organizado de labels para issues y PR:
 
 - **Priority**: `critical`, `high`, `medium`, `low`
 - **Type**: `bug`, `feature`, `enhancement`, `documentation`, `testing`, `refactor`, `security`
@@ -193,7 +238,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 Para preguntas o problemas:
 
 - 📧 Crear un [Issue](https://github.com/WorkTeam01/SistemaReservasHospital/issues)
-- 📖 Consultar la [Documentación](.github/DEVELOPER_GUIDE.md)
+- 📖 Consultar la [Documentación](.github/docs/DEVELOPER_GUIDE.md)
 
 ---
 
