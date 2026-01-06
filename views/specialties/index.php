@@ -20,12 +20,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8">
+                <!-- Tabla de Especialidades -->
                 <div class="card card-outline card-primary">
                     <div class="card-header">
                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                             <h3 class="card-title">Listado de Especialidades</h3>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#modal-create">
                                     <i class="fas fa-plus"></i> Nueva Especialidad
                                 </button>
@@ -55,38 +56,40 @@
                                         <td><?= htmlspecialchars($specialty['name']) ?></td>
                                         <td class="text-center">
                                             <?php if ($specialty['is_active']): ?>
-                                                <span class="badge badge-success">Activo</span>
+                                                <span class="badge badge-success p-2">Activo</span>
                                             <?php else: ?>
-                                                <span class="badge badge-danger">Inactivo</span>
+                                                <span class="badge badge-danger p-2">Inactivo</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group">
+                                            <div class="btn-group" role="group">
                                                 <!-- Botón Editar con atributos data -->
                                                 <button type="button" class="btn btn-success btn-sm btn-edit"
                                                     data-id="<?= $specialty['specialty_id'] ?>"
                                                     data-name="<?= htmlspecialchars($specialty['name']) ?>"
-                                                    data-toggle="modal" data-target="#modal-edit">
+                                                    data-toggle="modal" data-target="#modal-edit" data-togle="tooltip"
+                                                    title="Editar">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
 
                                                 <!-- Botón Toggle (Activar/Desactivar) -->
-                                                <form action="/especialidades/toggle" method="POST"
-                                                    class="d-inline form-toggle">
-                                                    <input type="hidden" name="id"
-                                                        value="<?= $specialty['specialty_id'] ?>">
-                                                    <input type="hidden" name="status"
-                                                        value="<?= $specialty['is_active'] ?>">
-                                                    <?php if ($specialty['is_active']): ?>
-                                                        <button type="submit" class="btn btn-warning btn-sm" title="Desactivar">
-                                                            <i class="fas fa-ban"></i>
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <button type="submit" class="btn btn-info btn-sm" title="Activar">
-                                                            <i class="fas fa-redo"></i>
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </form>
+                                                <?php if ($specialty['is_active']): ?>
+                                                    <button class="btn btn-warning btn-sm btn-toggle-specialty"
+                                                        data-id="<?= $specialty['specialty_id'] ?>"
+                                                        data-status="1"
+                                                        title="Desactivar"
+                                                        data-toggle="tooltip">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="btn btn-info btn-sm btn-toggle-specialty"
+                                                        data-id="<?= $specialty['specialty_id'] ?>"
+                                                        data-status="0"
+                                                        title="Activar"
+                                                        data-toggle="tooltip">
+                                                        <i class="fas fa-redo"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
@@ -98,6 +101,8 @@
                 </div>
                 <!-- /.card -->
             </div>
+
+            <!-- Columna de Información -->
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header card-outline card-info">

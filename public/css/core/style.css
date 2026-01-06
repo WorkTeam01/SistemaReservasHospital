@@ -4,3 +4,24 @@
    ======================================== */
 
 /* Aquí puedes agregar tus estilos personalizados sin interferir con AdminLTE */
+
+/* En pantallas pequeñas, centrar el contenido cuando la versión se oculta */
+@media (max-width: 575.98px) {
+    .main-footer .footer-content {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* En pantallas grandes, mantener alineación a la izquierda */
+@media (min-width: 576px) {
+    .main-footer .footer-content {
+        text-align: left;
+    }
+}
+
+/* Estilo adicional para el ícono de versión */
+.main-footer .fas.fa-tag {
+    font-size: 0.8em;
+    margin-right: 3px;
+}

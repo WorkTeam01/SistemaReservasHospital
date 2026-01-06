@@ -257,7 +257,7 @@ const AlertUtils = {
             if (result.isConfirmed) {
                 ToastUtils.loadingWithMinTime('Eliminando...', () => {
                     window.location.href = url;
-                }, 800);
+                }, 1500);
             }
         });
         return false;

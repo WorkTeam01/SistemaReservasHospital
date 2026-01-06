@@ -35,14 +35,6 @@
                     </a>
                 </li>
 
-                <!-- Doctores -->
-                <li class="nav-item">
-                    <a href="<?= URL_BASE; ?>/doctors" class="nav-link">
-                        <i class="fas fa-hospital-user nav-icon"></i>
-                        <p>Doctores</p>
-                    </a>
-                </li>
-
                 <!-- Pacientes -->
                 <li class="nav-item">
                     <a href="<?= URL_BASE; ?>/pacientes" class="nav-link">

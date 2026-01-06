@@ -27,7 +27,7 @@ $(document).ready(function () {
                             return $('#name').val();
                         },
                         id: function() {
-                            return null; // No hay ID en creación
+                            return null;
                         }
                     }
                 }
@@ -51,7 +51,7 @@ $(document).ready(function () {
         unhighlight: function (element) {
             $(element).removeClass('is-invalid');
         },
-        submitHandler: function (form) {
+        submitHandler: function () {
             crearEspecialidad();
         }
     });
@@ -72,7 +72,7 @@ $(document).ready(function () {
                             return $('#edit-name').val();
                         },
                         id: function() {
-                            return $('#edit-id').val(); // Incluir ID para excluir en validación
+                            return $('#edit-id').val();
                         }
                     }
                 }
@@ -96,7 +96,7 @@ $(document).ready(function () {
         unhighlight: function (element) {
             $(element).removeClass('is-invalid');
         },
-        submitHandler: function (form) {
+        submitHandler: function () {
             actualizarEspecialidad();
         }
     });
@@ -140,7 +140,7 @@ $(document).ready(function () {
                     ToastUtils.error('Error al guardar');
                 }
             });
-        }, 1000);
+        }, 2000);
     }
 
     // ========================================================================
@@ -186,7 +186,7 @@ $(document).ready(function () {
                     ToastUtils.error('Error al cargar datos');
                 }
             });
-        }, 500);
+        }, 1500);
     });
 
     // ========================================================================
@@ -227,40 +227,31 @@ $(document).ready(function () {
                     ToastUtils.error('Error al actualizar');
                 }
             });
-        }, 1000);
+        }, 2000);
     }
 
     // ========================================================================
     // ELIMINAR (AJAX) - Adaptado para usar delegación
     // ========================================================================
     // ========================================================================
-    // TOGGLE ESTADO (AJAX)
+    // TOGGLE ESTADO (AJAX) - Con enlaces simples
     // ========================================================================
-    $('#specialtiesTable').on('submit', '.form-toggle', function (e) {
+    $('#specialtiesTable').on('click', '.btn-toggle-specialty', function (e) {
         e.preventDefault();
-        const form = this;
-        const id = $(form).find('input[name="id"]').val();
-        const status = $(form).find('input[name="status"]').val(); // 1 = Activo, 0 = Inactivo
+        const id = $(this).data('id');
+        const status = $(this).data('status');
 
-        const isDeactivating = (status === '1');
+        const isDeactivating = (status === 1);
         const title = isDeactivating ? '¿Desactivar especialidad?' : '¿Activar especialidad?';
         const text = isDeactivating
             ? "La especialidad no estará disponible para nuevas citas."
             : "La especialidad volverá a estar disponible.";
-        const btnText = isDeactivating ? 'Sí, desactivar' : 'Sí, activar';
-        const btnColor = isDeactivating ? '#d33' : '#17a2b8';
 
-        Swal.fire({
-            title: title,
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: btnColor,
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: btnText,
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        AlertUtils.confirm(
+            title,
+            text,
+            function() {
+                // Callback cuando se confirma
                 $.ajax({
                     url: URL_BASE + '/especialidades/toggle',
                     type: 'POST',
@@ -278,8 +269,15 @@ $(document).ready(function () {
                         ToastUtils.error('Error al cambiar estado');
                     }
                 });
+            },
+            {
+                icon: 'warning',
+                confirmColor: isDeactivating ? '#d33' : '#17a2b8',
+                cancelColor: '#6c757d',
+                confirmText: isDeactivating ? 'Sí, desactivar' : 'Sí, activar',
+                cancelText: 'Cancelar'
             }
-        });
+        );
     });
 
     // ========================================================================
