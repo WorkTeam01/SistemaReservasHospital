@@ -1,12 +1,12 @@
 /**
  * ============================================================================
- * GESTIÓN DE ESPECIALIDADES - Inicialización DataTable
+ * GESTIÓN DE PACIENTES - Inicialización DataTable
  * ============================================================================
- * Configuración e inicialización del DataTable para el listado de especialidades
+ * Configuración e inicialización del DataTable para el listado de pacientes
  */
 
 $(document).ready(function () {
-    $("#specialtiesTable").DataTable({
+    $("#patientsTable").DataTable({
         "responsive": true,
         "autoWidth": false,
         buttons: [{
@@ -17,15 +17,15 @@ $(document).ready(function () {
                 text: 'Copiar',
                 extend: 'copy',
                 exportOptions: {
-                    columns: [0, 1, 2]
+                    columns: [0, 1, 2, 3, 4, 5]
                 }
             }, {
                 extend: 'pdf',
-                title: 'Reporte de Especialidades - Sistema de Gestión Hospitalaria',
-                filename: 'reporte_especialidades_' + new Date().toISOString().slice(0, 10),
+                title: 'Reporte de Pacientes - Sistema de Gestión Hospitalaria',
+                filename: 'reporte_pacientes_' + new Date().toISOString().slice(0, 10),
                 pageSize: 'LEGAL',
                 exportOptions: {
-                    columns: [0, 1, 2]
+                    columns: [0, 1, 2, 3, 4, 5]
                 },
                 customize: function (doc) {
                     doc.defaultStyle.fontSize = 10;
@@ -34,7 +34,7 @@ $(document).ready(function () {
                     doc.styles.tableHeader.color = '#ffffff';
 
                     doc.content.splice(0, 1, {
-                        text: 'REPORTE DE ESPECIALIDADES - SISTEMA DE GESTIÓN HOSPITALARIA',
+                        text: 'REPORTE DE PACIENTES - SISTEMA DE GESTIÓN HOSPITALARIA',
                         style: {
                             fontSize: 16,
                             alignment: 'center',
@@ -44,7 +44,7 @@ $(document).ready(function () {
                     });
 
                     doc.content.splice(1, 0, {
-                        text: 'Especialidades registradas',
+                        text: 'Pacientes registrados',
                         style: {
                             fontSize: 11,
                             alignment: 'center',
@@ -86,24 +86,24 @@ $(document).ready(function () {
                 }
             }, {
                 extend: 'excel',
-                title: 'Reporte de Especialidades - Sistema de Gestión Hospitalaria',
-                messageTop: 'Registro de especialidades del sistema',
+                title: 'Reporte de Pacientes - Sistema de Gestión Hospitalaria',
+                messageTop: 'Registro de pacientes del sistema',
                 messageBottom: 'Documento generado el ' + new Date().toLocaleDateString('es-BO'),
                 exportOptions: {
-                    columns: [0, 1, 2]
+                    columns: [0, 1, 2, 3, 4, 5]
                 }
             }, {
                 extend: 'csv',
                 exportOptions: {
-                    columns: [0, 1, 2]
+                    columns: [0, 1, 2, 3, 4, 5]
                 }
             }, {
                 extend: 'print',
                 text: 'Imprimir',
-                title: 'Reporte de Especialidades - Sistema de Gestión Hospitalaria',
+                title: 'Reporte de Pacientes - Sistema de Gestión Hospitalaria',
                 messageTop: 'Reporte generado el ' + new Date().toLocaleDateString('es-BO'),
                 exportOptions: {
-                    columns: [0, 1, 2]
+                    columns: [0, 1, 2, 3, 4, 5]
                 },
                 customize: function (win) {
                     $(win.document.body).find('table')
@@ -117,19 +117,19 @@ $(document).ready(function () {
             text: 'Columnas'
         }
         ],
-        "pageLength": 5,
+        "pageLength": 10,
         lengthMenu: [
-            [3, 5, 10, 25, 50],
-            [3, 5, 10, 25, 50]
+            [5, 10, 25, 50, 100],
+            [5, 10, 25, 50, 100]
         ],
         "language": {
             "sProcessing": "Procesando...",
             "sLengthMenu": "Mostrar _MENU_ registros",
             "sZeroRecords": "No se encontraron resultados",
             "sEmptyTable": "Ningún dato disponible en esta tabla",
-            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ Especialidades",
-            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 Especialidades",
-            "sInfoFiltered": "(filtrado de un total de MAX Especialidades)",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ Pacientes",
+            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 Pacientes",
+            "sInfoFiltered": "(filtrado de un total de MAX Pacientes)",
             "sInfoPostFix": "",
             "sSearch": "Buscar:",
             "sUrl": "",
@@ -149,5 +149,5 @@ $(document).ready(function () {
         initComplete: function () {
             $(this.api().table().node()).css('visibility', 'visible');
         }
-    }).buttons().container().appendTo('#specialtiesTable_wrapper .col-md-6:eq(0)');
+    }).buttons().container().appendTo('#patientsTable_wrapper .col-md-6:eq(0)');
 });

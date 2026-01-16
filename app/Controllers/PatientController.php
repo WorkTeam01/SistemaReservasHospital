@@ -18,8 +18,16 @@ class PatientController extends Controller
     {
         Middleware::auth();
         // TODO: Implementar en RF04
+        // Obtener todos los pacientes (método heredado del Model)
+        $patients = $this->patientModel->all();
+
         $this->renderWithLayout('patients/index', [
-            'pageTitle' => 'Lista de Pacientes'
+            'pageTitle' => 'Gestión de Pacientes',
+            'patients' => $patients,
+            'pageScripts' => [
+                'js/modules/patients/datatable-patients.js',
+                'js/modules/patients/patient-actions.js'
+            ]
         ]);
     }
 
@@ -38,7 +46,7 @@ class PatientController extends Controller
     public function store()
     {
         Middleware::auth();
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['message'] = 'Método no permitido';
             $_SESSION['icon'] = 'error';
@@ -110,5 +118,52 @@ class PatientController extends Controller
 
         // Si existe y es otro paciente, no es válido
         echo json_encode(false);
+    }
+
+    /**
+     * Activa o desactiva un paciente (soft delete)
+     */
+    /**
+     * Activa o desactiva un paciente (vía AJAX)
+     */
+    public function toggle()
+    {
+        Middleware::auth();
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        $id = $_POST['id'] ?? null;
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'ID de paciente inválido']);
+            return;
+        }
+
+        // Obtener paciente actual
+        $patient = $this->patientModel->find($id);
+
+        if (!$patient) {
+            echo json_encode(['success' => false, 'message' => 'Paciente no encontrado']);
+            return;
+        }
+
+        // Invertir estado
+        $newState = $patient['is_active'] == 1 ? 0 : 1;
+
+        // Actualizar
+        $updated = $this->patientModel->update($id, ['is_active' => $newState]);
+
+        if ($updated) {
+            $message = $newState == 1
+                ? 'Paciente activado correctamente'
+                : 'Paciente desactivado correctamente';
+            echo json_encode(['success' => true, 'message' => $message]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al cambiar el estado']);
+        }
     }
 }
