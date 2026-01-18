@@ -1,6 +1,7 @@
 # Archivos de configuración
 app/Config/config.php
 .env
+.mcp.json
 
 # Archivos temporales de PHP
 *.log
